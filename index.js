@@ -248,6 +248,67 @@ router.post('/update_user', async (ctx, next) => {
     ctx.response.body = { code: -1, data: 'update fault' }
   }
 })
+//////
+router.post('/insert_nfc', async (ctx, next) => {
+  try {
+    var all = await Nfcs.findAll({
+      where: {
+        nfcid: ctx.request.body.nfcid
+      }
+    })
+    if (all && all.length > 0) {
+      ctx.response.type = 'json'
+      ctx.response.body = { code: -2, data: '新增失败 该NFC已经存在' }
+    } else {
+      await Nfcs.create(ctx.request.body)
+      ctx.response.type = 'json'
+      ctx.response.body = { code: 0, data: 'success' }
+    }
+  } catch (error) {
+    console.log(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'fault' }
+  }
+})
+router.post('/find_nfc', async (ctx, next) => {
+  try {
+    let all = await Nfcs.findAll({
+      where: ctx.request.body
+    })
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: all }
+  } catch (error) {
+    console.log(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'find fault' }
+  }
+})
+router.post('/remove_nfc', async (ctx, next) => {
+  try {
+    await Nfcs.destroy({
+      where: ctx.request.body
+    })
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: 'remove sucess' }
+  } catch (error) {
+    console.log(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'remove fault' }
+  }
+})
+router.post('/update_nfc', async (ctx, next) => {
+  try {
+    await Nfcs.update(ctx.request.body.update, {
+      where: ctx.request.body.query
+    })
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: 'update success' }
+  } catch (error) {
+    console.log(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'update fault' }
+  }
+})
 //----------------------------------------------------Devices-----------------------------------------------------
 var Devices = sequelize.define(
   'devices',
