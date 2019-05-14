@@ -610,7 +610,7 @@ router.post('/insert_record', async (ctx, next) => {
     ctx.request.body.content = JSON.stringify(contentAfterTrans);
     // console.log('我最后的返回值结果：', ctx.request.body);
     // return;
-    await Records.create(ctx.request.body) 
+    await Records.create(ctx.request.body)
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
