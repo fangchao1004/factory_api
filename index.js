@@ -320,6 +320,7 @@ var Devices = sequelize.define(
     },
     nfc_id: Sequelize.INTEGER(11),
     name: Sequelize.STRING(100),
+    remark: Sequelize.STRING(100),
     type_id: Sequelize.INTEGER(11),
     area_id: Sequelize.INTEGER(11),
     status: Sequelize.INTEGER(11),
