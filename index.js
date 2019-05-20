@@ -780,7 +780,7 @@ var Tasks = sequelize.define(
     },
     from: Sequelize.STRING(100),
     to: Sequelize.STRING(100),
-    copy: Sequelize.STRING(100),
+    status: Sequelize.INTEGER(1),
     title: Sequelize.STRING(100),
     content: Sequelize.STRING(100)
   },
