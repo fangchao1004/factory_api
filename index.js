@@ -55,7 +55,8 @@ var Users = sequelize.define(
     nfc_id: Sequelize.INTEGER(100),
     username: Sequelize.STRING(100),
     password: Sequelize.STRING(100),
-    name: Sequelize.STRING(11)
+    name: Sequelize.STRING(100),
+    phonenumber: Sequelize.STRING(11)
   },
   {
     timestamps: true
