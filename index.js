@@ -11,6 +11,18 @@ const app = new Koa()
 const uuidv1 = require('uuid/v1')
 const send = require('koa-send');
 const moment = require('moment');
+const Core = require('@alicloud/pop-core');
+
+var client = new Core({
+  accessKeyId: 'LTAIKlkSwGRxGUs2',
+  accessKeySecret: 'VwwbCrudDp7g2cDmk6vNBtiwcCliyV',
+  endpoint: 'https://dysmsapi.aliyuncs.com',
+  apiVersion: '2017-05-25'
+});
+
+var requestOption = {
+  method: 'POST'
+};
 
 app.use(cors())
 // app.use(koaBody({ multipart: true }));
@@ -21,9 +33,6 @@ app.use(koaBody({
   }
 }));
 app.use(router.routes()).use(router.allowedMethods());
-
-
-
 
 
 var sequelize = new Sequelize(
@@ -476,6 +485,7 @@ router.post('/insert_area', async (ctx, next) => {
   }
 })
 router.post('/find_area', async (ctx, next) => {
+  console.log('区域:', ctx.request.body);
   try {
     let all = await Areas.findAll({
       where: ctx.request.body
@@ -911,6 +921,33 @@ router.post('/update_problem', async (ctx, next) => {
     await Problems.update(ctx.request.body.update, {
       where: ctx.request.body.query
     })
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: 'update success' }
+  } catch (error) {
+    console.log(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'update fault' }
+  }
+})
+
+router.post('/sendMessageToStaffs', async (ctx, next) => {
+  try {
+    console.log("监听到短信请求：", ctx.request.body);
+    // let paramObj = JSON.parse(ctx.request.body);
+    let copyData = JSON.parse(JSON.stringify(ctx.request.body));
+    delete copyData.phonenumber
+    let params = {
+      "PhoneNumbers": ctx.request.body.phonenumber,
+      "SignName": "中节能合肥",
+      "TemplateCode": "SMS_166096683",
+      "TemplateParam": JSON.stringify(copyData)
+    }
+    client.request('SendSms', params, requestOption).then((result) => {
+      console.log(result);
+    }, (ex) => {
+      console.log(ex);
+    })
+
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
