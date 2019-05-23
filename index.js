@@ -779,11 +779,12 @@ var Tasks = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    from: Sequelize.STRING(100),
+    from: Sequelize.INTEGER(11),
     to: Sequelize.STRING(100),
     status: Sequelize.INTEGER(1),
     title: Sequelize.STRING(100),
-    content: Sequelize.STRING(100)
+    content: Sequelize.STRING(100),
+    overTime: Sequelize.STRING(100)
   },
   {
     timestamps: true
