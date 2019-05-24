@@ -62,6 +62,7 @@ var Users = sequelize.define(
       autoIncrement: true
     },
     level_id: Sequelize.INTEGER(11),
+    isadmin: Sequelize.INTEGER(1),
     nfc_id: Sequelize.INTEGER(100),
     username: Sequelize.STRING(100),
     password: Sequelize.STRING(100),
