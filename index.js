@@ -12,6 +12,7 @@ const uuidv1 = require('uuid/v1')
 const send = require('koa-send');
 const moment = require('moment');
 const Core = require('@alicloud/pop-core');
+const schedule = require('node-schedule');
 
 var client = new Core({
   accessKeyId: 'LTAIKlkSwGRxGUs2',
@@ -793,7 +794,7 @@ var Tasks = sequelize.define(
     status: Sequelize.INTEGER(1),
     title: Sequelize.STRING(100),
     content: Sequelize.STRING(100),
-    overTime: Sequelize.STRING(100)
+    overTime: Sequelize.DOUBLE(13)
   },
   {
     timestamps: true
@@ -983,6 +984,64 @@ router.post('/sendMessageToLeader', async (ctx, next) => {
   }
 })
 
+///设置一个定时器 每天的9点触发
+function setScheduleJob() {
+  schedule.scheduleJob('0 0 9 * * *', () => {
+    console.log('每天的9点触发:' + new Date());
+    checkTaskHandler()
+  });
+}
+async function checkTaskHandler() {
+  console.log('开始检查');
+  let currentTime = new Date().getTime();
+  // console.log('当前时刻', currentTime);
+  ///查询出状态 未完成 且截止时间大于当前时间的 符合条件的对象
+  ///同时左连接上users表获取 用户的详细信息  (暂时不会左连接，后期优化)
+  let allUncompleteTaskData = await Tasks.findAll({
+    where: {
+      status: 0,
+      overTime: { $gt: currentTime }
+    }
+  })
+  console.log("符合条件的任务对象有几个:", allUncompleteTaskData.length);
+  if (allUncompleteTaskData.length == 0) { return }
+  console.log('分别是：');
+  let tempArr = [];
+  for (let item of allUncompleteTaskData) {
+    let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item)));
+    let from_obj = await Users.findOne({ where: { id: item.from } })
+    let to_Arr = await Users.findAll({ where: { id: to_ids } })
+    let temp_to_arr = [];
+    to_Arr.forEach((item) => {
+      temp_to_arr.push({ name: item.name, phonenumber: item.phonenumber })
+    })
+    // console.log('单个对象：',temp_to_arr);
+    tempArr.push({ title: item.title, name_from: from_obj.name, to: temp_to_arr });
+  }
+  // console.log(tempArr);///短信任务数组列表
+  sendMessageToNotice(tempArr);
+}
+function sendMessageToNotice(paramsArr) {
+  paramsArr.forEach((item, index) => {
+    // console.log('任务', index, '详情', item);
+    // console.log('任务', index, '主题', item.title,'发起人',item.name_from);
+    item.to.forEach((element) => {
+      console.log('所有待发短信：主题', item.title, '发起人', item.name_from, '执行人', element.name, '执行人手机', element.phonenumber);
+      let params = {
+        "PhoneNumbers": element.phonenumber,
+        "SignName": "中节能合肥",
+        "TemplateCode": "SMS_166096679",
+        "TemplateParam": JSON.stringify({ name_from: item.name_from, name: element.name, title: item.title })
+      }
+      client.request('SendSms', params, requestOption).then((result) => {
+        console.log(result);
+      }, (ex) => {
+        console.log(ex);
+      })
+    })
+  })
+}
 
 app.listen(3009)
 console.log('app started at port 3009...')
+setScheduleJob();
