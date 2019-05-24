@@ -485,7 +485,6 @@ router.post('/insert_area', async (ctx, next) => {
   }
 })
 router.post('/find_area', async (ctx, next) => {
-  console.log('区域:', ctx.request.body);
   try {
     let all = await Areas.findAll({
       where: ctx.request.body
@@ -933,21 +932,48 @@ router.post('/update_problem', async (ctx, next) => {
 router.post('/sendMessageToStaffs', async (ctx, next) => {
   try {
     console.log("监听到短信请求：", ctx.request.body);
-    // let paramObj = JSON.parse(ctx.request.body);
-    let copyData = JSON.parse(JSON.stringify(ctx.request.body));
-    delete copyData.phonenumber
+    let paramArr = ctx.request.body;
+    paramArr.forEach(element => {
+      let phonenumber = element.phonenumber;
+      delete element.phonenumber
+      let params = {
+        "PhoneNumbers": phonenumber,
+        "SignName": "中节能合肥",
+        "TemplateCode": "SMS_166096683",
+        "TemplateParam": JSON.stringify(element)
+      }
+      client.request('SendSms', params, requestOption).then((result) => {
+        console.log(result);
+      }, (ex) => {
+        console.log(ex);
+      })
+    });
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: 'update success' }
+  } catch (error) {
+    console.log(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'update fault' }
+  }
+})
+
+router.post('/sendMessageToLeader', async (ctx, next) => {
+  try {
+    console.log("监听到回馈短信请求：", ctx.request.body);
+    let paramObj = ctx.request.body;
+    let phonenumber = paramObj.phonenumber;
+    delete paramObj.phonenumber
     let params = {
-      "PhoneNumbers": ctx.request.body.phonenumber,
+      "PhoneNumbers": phonenumber,
       "SignName": "中节能合肥",
-      "TemplateCode": "SMS_166096683",
-      "TemplateParam": JSON.stringify(copyData)
+      "TemplateCode": "SMS_166081562",
+      "TemplateParam": JSON.stringify(paramObj)
     }
     client.request('SendSms', params, requestOption).then((result) => {
       console.log(result);
     }, (ex) => {
       console.log(ex);
     })
-
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
