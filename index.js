@@ -6,13 +6,20 @@ const koaBody = require('koa-body')
 const Router = require('koa-router');
 const router = new Router();
 const fs = require('fs')
-const path = require('path')
 const app = new Koa()
-const uuidv1 = require('uuid/v1')
-const send = require('koa-send');
-const moment = require('moment');
 const Core = require('@alicloud/pop-core');
 const schedule = require('node-schedule');
+
+//----------------------------------------------------------------------------------------------------------------
+//  增加日志文件输出
+//----------------------------------------------------------------------------------------------------------------
+const log4js = require('log4js')
+log4js.configure({
+  appenders: { app: { type: 'file', filename: 'app.log' } },
+  categories: { default: { appenders: ['app'], level: 'debug' } }
+})
+const logger = log4js.getLogger('xiaomu')
+//----------------------------------------------------------------------------------------------------------------
 
 var client = new Core({
   accessKeyId: 'LTAIKlkSwGRxGUs2',
@@ -113,7 +120,7 @@ router.post('/loginByUserInfo', async (ctx, next) => {
       }
     }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -128,14 +135,14 @@ router.post('/loginByNFC', async (ctx, next) => {
       }
     })
     if (nfcOne) {
-      // console.log('nfc表中存在这个卡的数据_id是：', nfcOne.dataValues.id);
+      // logger.debug('nfc表中存在这个卡的数据_id是：', nfcOne.dataValues.id);
       let userInfo = await Users.findOne({
         where: {
           nfc_id: nfcOne.dataValues.id
         }
       })
       if (userInfo) {
-        // console.log('用户数据：', userInfo);
+        // logger.debug('用户数据：', userInfo);
         ctx.response.type = 'json'
         ctx.response.body = { code: 0, data: userInfo }
         return;
@@ -150,7 +157,7 @@ router.post('/loginByNFC', async (ctx, next) => {
       return;
     }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -165,14 +172,14 @@ router.post('/getDeviceInfoByNFC', async (ctx, next) => {
       }
     })
     if (nfcOne) {
-      // console.log('nfc表中存在这个卡的数据_id是：', nfcOne.dataValues.id);
+      // logger.debug('nfc表中存在这个卡的数据_id是：', nfcOne.dataValues.id);
       let deviceInfo = await Devices.findOne({
         where: {
           nfc_id: nfcOne.dataValues.id
         }
       })
       if (deviceInfo) {
-        // console.log('deviceInfo::', deviceInfo);
+        // logger.debug('deviceInfo::', deviceInfo);
         ctx.response.type = 'json'
         ctx.response.body = { code: 0, data: deviceInfo }
         return;
@@ -187,7 +194,7 @@ router.post('/getDeviceInfoByNFC', async (ctx, next) => {
       return;
     }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: '查询失败' }
   }
@@ -215,7 +222,7 @@ router.post('/insert_user', async (ctx, next) => {
       ctx.response.body = { code: 0, data: 'success' }
     }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -229,7 +236,7 @@ router.post('/find_user', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -242,7 +249,7 @@ router.post('/remove_user', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -255,7 +262,7 @@ router.post('/update_user', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -277,7 +284,7 @@ router.post('/insert_nfc', async (ctx, next) => {
       ctx.response.body = { code: 0, data: 'success' }
     }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -290,7 +297,7 @@ router.post('/find_nfc', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -303,7 +310,7 @@ router.post('/remove_nfc', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -316,7 +323,7 @@ router.post('/update_nfc', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -348,7 +355,7 @@ router.post('/insert_device', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -361,7 +368,7 @@ router.post('/find_device', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -374,7 +381,7 @@ router.post('/remove_device', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -387,7 +394,7 @@ router.post('/update_device', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -415,7 +422,7 @@ router.post('/insert_device_type', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -428,7 +435,7 @@ router.post('/find_device_type', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -441,7 +448,7 @@ router.post('/remove_device_type', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -454,7 +461,7 @@ router.post('/update_device_type', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -481,7 +488,7 @@ router.post('/insert_area', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -494,7 +501,7 @@ router.post('/find_area', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -507,7 +514,7 @@ router.post('/remove_area', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -520,7 +527,7 @@ router.post('/update_area', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -549,7 +556,7 @@ router.post('/insert_sample', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -562,7 +569,7 @@ router.post('/find_sample', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -575,7 +582,7 @@ router.post('/remove_sample', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -588,7 +595,7 @@ router.post('/update_sample', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -618,28 +625,28 @@ router.post('/insert_record', async (ctx, next) => {
   try {
     let copyRequsetBody = JSON.parse(JSON.stringify(ctx.request.body));
     let content = JSON.parse(copyRequsetBody.content);
-    // console.log('初始化数据：',content);
+    // logger.debug('初始化数据：',content);
     let contentAfterTrans = await transformHandler(content);
     ctx.request.body.content = JSON.stringify(contentAfterTrans);
-    // console.log('我最后的返回值结果：', ctx.request.body);
+    // logger.debug('我最后的返回值结果：', ctx.request.body);
     // return;
     await Records.create(ctx.request.body)
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
 })
 
 async function transformHandler(content) {
-  // console.log("初始数据：" + JSON.stringify(content));
+  // logger.debug("初始数据：" + JSON.stringify(content));
   for (let element of content) {
     if (element.type_id === "6" && element.value.length > 0) {  ///图片base64数组
-      // console.log('图片数据：',element.value, typeof element.value);///array
+      // logger.debug('图片数据：',element.value, typeof element.value);///array
       let newPathValueArr = await writeImages(element.value);
-      // console.log("处理后的数组：",newPathValueArr);
+      // logger.debug("处理后的数组：",newPathValueArr);
       element.value = newPathValueArr;////["路径1","路径2",....]
     }
   };
@@ -652,11 +659,11 @@ async function writeImages(imageArr) {
       let OneImgPath = await writeOneImg(item);
       pathArr.push(OneImgPath);
     } catch (error) {
-      console.log('error:' + error);
+      logger.debug('error:' + error);
       return [];
     }
   }
-  // console.log('全部写入成功', pathArr);
+  // logger.debug('全部写入成功', pathArr);
   return pathArr;
 }
 function writeOneImg(item) {
@@ -683,7 +690,7 @@ router.post('/find_record', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -696,7 +703,7 @@ router.post('/remove_record', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -709,7 +716,7 @@ router.post('/update_record', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -737,7 +744,7 @@ router.post('/insert_level', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -750,7 +757,7 @@ router.post('/find_level', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -763,7 +770,7 @@ router.post('/remove_level', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -776,7 +783,7 @@ router.post('/update_level', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -808,7 +815,7 @@ router.post('/insert_task', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -821,7 +828,7 @@ router.post('/find_task', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -834,7 +841,7 @@ router.post('/remove_task', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -847,7 +854,7 @@ router.post('/update_task', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -886,7 +893,7 @@ router.post('/insert_problem', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'fault' }
   }
@@ -899,7 +906,7 @@ router.post('/find_problem', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: all }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'find fault' }
   }
@@ -912,7 +919,7 @@ router.post('/remove_problem', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'remove sucess' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'remove fault' }
   }
@@ -925,7 +932,7 @@ router.post('/update_problem', async (ctx, next) => {
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -933,7 +940,7 @@ router.post('/update_problem', async (ctx, next) => {
 
 router.post('/sendMessageToStaffs', async (ctx, next) => {
   try {
-    console.log("监听到短信请求：", ctx.request.body);
+    logger.debug("监听到短信请求：", ctx.request.body);
     let paramArr = ctx.request.body;
     paramArr.forEach(element => {
       let phonenumber = element.phonenumber;
@@ -945,15 +952,15 @@ router.post('/sendMessageToStaffs', async (ctx, next) => {
         "TemplateParam": JSON.stringify(element)
       }
       client.request('SendSms', params, requestOption).then((result) => {
-        console.log(result);
+        logger.debug(result);
       }, (ex) => {
-        console.log(ex);
+        logger.debug(ex);
       })
     });
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -961,7 +968,7 @@ router.post('/sendMessageToStaffs', async (ctx, next) => {
 
 router.post('/sendMessageToLeader', async (ctx, next) => {
   try {
-    console.log("监听到回馈短信请求：", ctx.request.body);
+    logger.debug("监听到回馈短信请求：", ctx.request.body);
     let paramObj = ctx.request.body;
     let phonenumber = paramObj.phonenumber;
     delete paramObj.phonenumber
@@ -972,14 +979,14 @@ router.post('/sendMessageToLeader', async (ctx, next) => {
       "TemplateParam": JSON.stringify(paramObj)
     }
     client.request('SendSms', params, requestOption).then((result) => {
-      console.log(result);
+      logger.debug(result);
     }, (ex) => {
-      console.log(ex);
+      logger.debug(ex);
     })
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: 'update success' }
   } catch (error) {
-    console.log(error)
+    logger.debug(error)
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'update fault' }
   }
@@ -987,15 +994,15 @@ router.post('/sendMessageToLeader', async (ctx, next) => {
 
 ///设置一个定时器 每天的9点触发
 function setScheduleJob() {
-  schedule.scheduleJob('0 0 9 * * *', () => {
-    console.log('每天的9点触发:' + new Date());
+  schedule.scheduleJob('0 40 14 * * *', () => {
+    logger.debug('每天的9点触发:' + new Date());
     checkTaskHandler()
   });
 }
 async function checkTaskHandler() {
-  console.log('开始检查');
+  logger.debug('开始检查');
   let currentTime = new Date().getTime();
-  // console.log('当前时刻', currentTime);
+  // logger.debug('当前时刻', currentTime);
   ///查询出状态 未完成 且截止时间大于当前时间的 符合条件的对象
   ///同时左连接上users表获取 用户的详细信息  (暂时不会左连接，后期优化)
   let allUncompleteTaskData = await Tasks.findAll({
@@ -1004,9 +1011,9 @@ async function checkTaskHandler() {
       overTime: { $gt: currentTime }
     }
   })
-  console.log("符合条件的任务对象有几个:", allUncompleteTaskData.length);
+  logger.debug("符合条件的任务对象有几个:", allUncompleteTaskData.length);
   if (allUncompleteTaskData.length == 0) { return }
-  console.log('分别是：');
+  logger.debug('分别是：');
   let tempArr = [];
   for (let item of allUncompleteTaskData) {
     let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item)));
@@ -1016,18 +1023,18 @@ async function checkTaskHandler() {
     to_Arr.forEach((item) => {
       temp_to_arr.push({ name: item.name, phonenumber: item.phonenumber })
     })
-    // console.log('单个对象：',temp_to_arr);
+    // logger.debug('单个对象：',temp_to_arr);
     tempArr.push({ title: item.title, name_from: from_obj.name, to: temp_to_arr });
   }
-  // console.log(tempArr);///短信任务数组列表
+  // logger.debug(tempArr);///短信任务数组列表
   sendMessageToNotice(tempArr);
 }
 function sendMessageToNotice(paramsArr) {
   paramsArr.forEach((item, index) => {
-    // console.log('任务', index, '详情', item);
-    // console.log('任务', index, '主题', item.title,'发起人',item.name_from);
+    // logger.debug('任务', index, '详情', item);
+    // logger.debug('任务', index, '主题', item.title,'发起人',item.name_from);
     item.to.forEach((element) => {
-      console.log('所有待发短信：主题', item.title, '发起人', item.name_from, '执行人', element.name, '执行人手机', element.phonenumber);
+      logger.debug('所有待发短信：主题', item.title, '发起人', item.name_from, '执行人', element.name, '执行人手机', element.phonenumber);
       let params = {
         "PhoneNumbers": element.phonenumber,
         "SignName": "中节能合肥",
@@ -1035,14 +1042,14 @@ function sendMessageToNotice(paramsArr) {
         "TemplateParam": JSON.stringify({ name_from: item.name_from, name: element.name, title: item.title })
       }
       client.request('SendSms', params, requestOption).then((result) => {
-        console.log(result);
+        logger.debug(result);
       }, (ex) => {
-        console.log(ex);
+        logger.debug(ex);
       })
     })
   })
 }
 
 app.listen(3009)
-console.log('app started at port 3009...')
+logger.debug('app started at port 3009...')
 setScheduleJob();
