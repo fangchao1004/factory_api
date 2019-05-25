@@ -802,7 +802,8 @@ var Tasks = sequelize.define(
     status: Sequelize.INTEGER(1),
     title: Sequelize.STRING(100),
     content: Sequelize.STRING(100),
-    overTime: Sequelize.DOUBLE(13)
+    overTime: Sequelize.DOUBLE(13),
+    isMessage: Sequelize.INTEGER(1),
   },
   {
     timestamps: true
@@ -1003,11 +1004,12 @@ async function checkTaskHandler() {
   logger.debug('开始检查');
   let currentTime = new Date().getTime();
   // logger.debug('当前时刻', currentTime);
-  ///查询出状态 未完成 且截止时间大于当前时间的 符合条件的对象
+  ///查询出状态 未完成 且截止时间大于当前时间的 isMessage===1 符合条件的对象
   ///同时左连接上users表获取 用户的详细信息  (暂时不会左连接，后期优化)
   let allUncompleteTaskData = await Tasks.findAll({
     where: {
       status: 0,
+      isMessage: 1,
       overTime: { $gt: currentTime }
     }
   })
@@ -1026,7 +1028,7 @@ async function checkTaskHandler() {
     // logger.debug('单个对象：',temp_to_arr);
     tempArr.push({ title: item.title, name_from: from_obj.name, to: temp_to_arr });
   }
-  // logger.debug(tempArr);///短信任务数组列表
+  logger.debug(tempArr);///短信任务数组列表
   sendMessageToNotice(tempArr);
 }
 function sendMessageToNotice(paramsArr) {
