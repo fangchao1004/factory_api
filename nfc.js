@@ -4,6 +4,26 @@ module.exports = function (router, sequelize, logger) {
 
   logger.debug('Nfcs API Init...')
 
+  var Devices = sequelize.define(
+    'devices',
+    {
+      id: {
+        type: Sequelize.STRING(100),
+        primaryKey: true,
+        autoIncrement: true
+      },
+      nfc_id: Sequelize.INTEGER(11),
+      name: Sequelize.STRING(100),
+      remark: Sequelize.STRING(100),
+      type_id: Sequelize.INTEGER(11),
+      area_id: Sequelize.INTEGER(11),
+      status: Sequelize.INTEGER(11),
+    },
+    {
+      timestamps: true
+    }
+  )
+
   var Nfcs = sequelize.define(
     'nfcs',
     {
@@ -67,14 +87,14 @@ module.exports = function (router, sequelize, logger) {
         }
       })
       if (nfcOne) {
-        // logger.debug('nfc表中存在这个卡的数据_id是：', nfcOne.dataValues.id);
+        logger.debug('nfc表中存在这个卡的数据_id是：', nfcOne.dataValues.id);
         let deviceInfo = await Devices.findOne({
           where: {
             nfc_id: nfcOne.dataValues.id
           }
         })
         if (deviceInfo) {
-          // logger.debug('deviceInfo::', deviceInfo);
+          logger.debug('deviceInfo::', deviceInfo);
           ctx.response.type = 'json'
           ctx.response.body = { code: 0, data: deviceInfo }
           return;
