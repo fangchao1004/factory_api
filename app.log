@@ -187,3 +187,110 @@
 [2019-05-29T12:05:49.104] [DEBUG] xiaomu - Tasks API Init...
 [2019-05-29T12:05:49.104] [DEBUG] xiaomu - Users API Init...
 [2019-05-29T12:05:49.106] [DEBUG] xiaomu - app started at port 3009...
+[2019-05-29T14:40:00.301] [DEBUG] xiaomu - 每天的9点触发:Wed May 29 2019 14:40:00 GMT+0800 (China Standard Time)
+[2019-05-29T14:40:00.303] [DEBUG] xiaomu - 开始检查
+[2019-05-29T16:57:37.160] [DEBUG] xiaomu - 监听到短信请求： [ { phonenumber: '15555105983',
+    name: '方超',
+    title: '呵呵呵',
+    time: '2019年05月30日' },
+  { phonenumber: '18119645092',
+    name: '谢二专',
+    title: '呵呵呵',
+    time: '2019年05月30日' },
+  { phonenumber: '15375342303',
+    name: '谢宝',
+    title: '呵呵呵',
+    time: '2019年05月30日' } ]
+[2019-05-29T16:57:37.514] [DEBUG] xiaomu - { Message: 'OK',
+  RequestId: '3AF0BC60-4181-4CD4-9D4A-A8B9470F1C29',
+  BizId: '548421459120257433^0',
+  Code: 'OK' }
+[2019-05-29T16:57:37.516] [DEBUG] xiaomu - { Message: 'OK',
+  RequestId: 'FA13AB15-4F9D-4941-B507-808764175F46',
+  BizId: '566820959120257433^0',
+  Code: 'OK' }
+[2019-05-29T16:57:37.517] [DEBUG] xiaomu - { Message: 'OK',
+  RequestId: 'DD30104B-67F6-4496-8139-D108FC540A28',
+  BizId: '269524459120257431^0',
+  Code: 'OK' }
+[2019-05-30T15:19:18.416] [DEBUG] xiaomu - Areas API Init...
+[2019-05-30T15:19:18.442] [DEBUG] xiaomu - Bugs API Init...
+[2019-05-30T15:19:18.444] [DEBUG] xiaomu - Devices API Init...
+[2019-05-30T15:19:18.446] [DEBUG] xiaomu - Device_Types API Init...
+[2019-05-30T15:19:18.447] [DEBUG] xiaomu - Levels API Init...
+[2019-05-30T15:19:18.448] [DEBUG] xiaomu - Nfcs API Init...
+[2019-05-30T15:19:18.450] [DEBUG] xiaomu - Problems API Init...
+[2019-05-30T15:19:18.451] [DEBUG] xiaomu - Records API Init...
+[2019-05-30T15:19:18.452] [DEBUG] xiaomu - Samples API Init...
+[2019-05-30T15:19:18.453] [DEBUG] xiaomu - Sms API Init...
+[2019-05-30T15:19:18.469] [DEBUG] xiaomu - Tasks API Init...
+[2019-05-30T15:19:18.470] [DEBUG] xiaomu - Users API Init...
+[2019-05-30T15:19:18.474] [DEBUG] xiaomu - app started at port 3009...
+[2019-05-30T15:35:08.751] [DEBUG] xiaomu - { SequelizeDatabaseError: read ETIMEDOUT
+    at Query.formatError (/Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/dialects/mysql/query.js:175:14)
+    at Query.<anonymous> (/Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/dialects/mysql/query.js:49:21)
+    at Query.<anonymous> (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/Connection.js:502:10)
+    at Query._callback (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/Connection.js:468:16)
+    at Query.Sequence.end (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/protocol/sequences/Sequence.js:83:24)
+    at Protocol.handleNetworkError (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/protocol/Protocol.js:361:14)
+    at Connection._handleNetworkError (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/Connection.js:420:18)
+    at Socket.emit (events.js:182:13)
+    at emitErrorNT (internal/streams/destroy.js:82:8)
+    at emitErrorAndCloseNT (internal/streams/destroy.js:50:3)
+    at process._tickCallback (internal/process/next_tick.js:63:19)
+  name: 'SequelizeDatabaseError',
+  message: 'read ETIMEDOUT',
+  parent:
+   { Error: read ETIMEDOUT
+       at TCP.onStreamRead (internal/stream_base_commons.js:111:27)
+       --------------------
+       at Protocol._enqueue (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/protocol/Protocol.js:144:48)
+       at Connection.query (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/Connection.js:200:25)
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/dialects/mysql/query.js:40:21
+       at Promise._execute (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/debuggability.js:313:9)
+       at Promise._resolveFromExecutor (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:483:18)
+       at new Promise (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:79:10)
+       at Query.run (/Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/dialects/mysql/query.js:39:17)
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/sequelize.js:843:20
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/retry-as-promised/index.js:39:21
+       at Promise._execute (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/debuggability.js:313:9)
+       at Promise._resolveFromExecutor (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:483:18)
+       at new Promise (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:79:10)
+       at retryAsPromised (/Users/coco/Documents/GitHub/factory_api/node_modules/retry-as-promised/index.js:29:10)
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/sequelize.js:842:12
+       at tryCatcher (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/util.js:16:23)
+       at Promise._settlePromiseFromHandler (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:512:31)
+     errno: 'ETIMEDOUT',
+     code: 'ETIMEDOUT',
+     syscall: 'read',
+     fatal: true,
+     sql:
+      'SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `levels` AS `levels`;' },
+  original:
+   { Error: read ETIMEDOUT
+       at TCP.onStreamRead (internal/stream_base_commons.js:111:27)
+       --------------------
+       at Protocol._enqueue (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/protocol/Protocol.js:144:48)
+       at Connection.query (/Users/coco/Documents/GitHub/factory_api/node_modules/mysql/lib/Connection.js:200:25)
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/dialects/mysql/query.js:40:21
+       at Promise._execute (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/debuggability.js:313:9)
+       at Promise._resolveFromExecutor (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:483:18)
+       at new Promise (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:79:10)
+       at Query.run (/Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/dialects/mysql/query.js:39:17)
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/sequelize.js:843:20
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/retry-as-promised/index.js:39:21
+       at Promise._execute (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/debuggability.js:313:9)
+       at Promise._resolveFromExecutor (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:483:18)
+       at new Promise (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:79:10)
+       at retryAsPromised (/Users/coco/Documents/GitHub/factory_api/node_modules/retry-as-promised/index.js:29:10)
+       at /Users/coco/Documents/GitHub/factory_api/node_modules/sequelize/lib/sequelize.js:842:12
+       at tryCatcher (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/util.js:16:23)
+       at Promise._settlePromiseFromHandler (/Users/coco/Documents/GitHub/factory_api/node_modules/bluebird/js/release/promise.js:512:31)
+     errno: 'ETIMEDOUT',
+     code: 'ETIMEDOUT',
+     syscall: 'read',
+     fatal: true,
+     sql:
+      'SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `levels` AS `levels`;' },
+  sql:
+   'SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `levels` AS `levels`;' }
