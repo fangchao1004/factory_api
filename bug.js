@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const fs = require('fs')
 
 module.exports = function (router, sequelize, logger) {
 
@@ -26,11 +27,15 @@ module.exports = function (router, sequelize, logger) {
 
     router.post('/insert_bug', async (ctx, next) => {
         try {
-            await Bugs.create(ctx.request.body)
+            let copyRequsetBody = JSON.parse(JSON.stringify(ctx.request.body));
+            let content = JSON.parse(copyRequsetBody.content);
+            let contentAfterTrans = await transformHandler(content);
+            ctx.request.body.content = JSON.stringify(contentAfterTrans);
+            let result = await Bugs.create(ctx.request.body)
             ctx.response.type = 'json'
-            ctx.response.body = { code: 0, data: 'success' }
+            ctx.response.body = { code: 0, data: result }
         } catch (error) {
-            logger.error(error)
+            console.error(error)
             ctx.response.type = 'json'
             ctx.response.body = { code: -1, data: 'fault' }
         }
@@ -74,4 +79,43 @@ module.exports = function (router, sequelize, logger) {
             ctx.response.body = { code: -1, data: 'update fault' }
         }
     })
+
+    async function transformHandler(content) {
+        // console.log("初始数据：" +  content.imgs.length);
+        let newPathValueArr = await writeImages(content.imgs);
+        // console.log("newPathValueArr:::", newPathValueArr);
+        content.imgs = newPathValueArr;////["路径1","路径2",....]
+        return content;
+    }
+    async function writeImages(imageArr) {
+        let pathArr = [];
+        for (const item of imageArr) {
+            try { ////捕获Promise的异常
+                let OneImgPath = await writeOneImg(item);
+                pathArr.push(OneImgPath);
+            } catch (error) {
+                console.log('error:' + error);
+                return [];
+            }
+        }
+        // logger.debug('全部写入成功', pathArr);
+        return pathArr;
+    }
+    function writeOneImg(item) {
+        ////最底层的异步操作，要包含在Promise方法中。用于直接调用 resolve 或 reject
+        let p = new Promise(function (resolve, reject) {        //做一些异步操作
+            let oneImgPath = '/Users/fangchao/Desktop/imageKU/' + new Date().getTime() + '.jpg';
+            var base64Data = item.replace(/^data:image\/\w+;base64,/, "");
+            let dataBuffer = new Buffer(base64Data, 'base64'); //把base64码转成buffer对象，
+            fs.writeFile(oneImgPath, dataBuffer, function (err) {//用fs写入文件
+                if (err) {
+                    reject('写入图片失败')
+                }
+                else {
+                    resolve(oneImgPath)
+                }
+            })
+        });
+        return p;
+    }
 }
