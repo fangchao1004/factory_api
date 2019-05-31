@@ -28,7 +28,7 @@ module.exports = function (router, sequelize, logger) {
 
     router.post('/loginByUserInfo', async (ctx, next) => {
         try {
-            let all = await Users.findAll({
+            let all = await Users.findOne({
                 where: {
                     username: ctx.request.body.username,
                     password: ctx.request.body.password

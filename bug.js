@@ -18,7 +18,8 @@ module.exports = function (router, sequelize, logger) {
             user_id: Sequelize.INTEGER(11),
             fixed_user_id: Sequelize.INTEGER(11),
             status: Sequelize.INTEGER(1),
-            content: Sequelize.STRING(100)
+            content: Sequelize.STRING(100),
+            buglevel: Sequelize.INTEGER(1),
         },
         {
             timestamps: true
