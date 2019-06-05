@@ -33,12 +33,7 @@ log4js.configure({
 const logger = log4js.getLogger('xiaomu')
 
 app.use(cors())
-app.use(koaBody({
-  multipart: true,
-  formidable: {
-    maxFileSize: 2000 * 1024 * 1024    // 设置上传文件大小最大限制，20M
-  }
-}));
+app.use(koaBody({ multipart: true }));
 app.use(router.routes()).use(router.allowedMethods());
 
 var sequelize = new Sequelize(

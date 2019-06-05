@@ -1,5 +1,11 @@
 const Sequelize = require('sequelize')
 const fs = require('fs')
+const path = require('path')
+const uuidv1 = require('uuid/v1')
+const send = require('koa-send')
+const url = require("url")
+const querystring = require("querystring")
+
 
 module.exports = function (router, sequelize, logger) {
 
@@ -125,4 +131,30 @@ module.exports = function (router, sequelize, logger) {
       ctx.response.body = { code: -1, data: 'update fault' }
     }
   })
+
+  router.post('/upload_file', async (ctx, next) => {
+    // 上传单个文件
+    console.log('upload file')
+    const file = ctx.request.files.audio; // 获取上传文件
+    console.log(ctx.request)
+    const reader = fs.createReadStream(file.path)
+    const uuid = uuidv1()
+    let filePath = path.join(__dirname, 'public/upload/') + `/${uuid}.png`;
+    // // 创建可写流
+    const upStream = fs.createWriteStream(filePath);
+    // // 可读流通过管道写入可写流
+    reader.pipe(upStream);
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: uuid }
+  })
+
+  router.get('/get_audio', async (ctx) => {
+    const arg = url.parse(ctx.req.url).query;
+    const params = querystring.parse(arg);
+    const uuid = params.uuid
+    let filePath = path.join('public/upload/') + `/${uuid}.png`;
+    ctx.attachment(filePath)
+    await send(ctx, filePath)
+  })
+
 }
