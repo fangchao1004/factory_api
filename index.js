@@ -4,8 +4,11 @@ const config = require('./config')
 const cors = require('koa2-cors');
 const koaBody = require('koa-body')
 const Router = require('koa-router');
+const compress = require('koa-compress');
 const router = new Router();
 const app = new Koa()
+const options = { threshold: 2048 }
+app.use(compress(options))
 
 const areaInit = require('./area')
 const bugInit = require('./bug')
