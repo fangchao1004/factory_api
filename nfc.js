@@ -24,6 +24,28 @@ module.exports = function (router, sequelize, logger) {
     }
   )
 
+  var Users = sequelize.define(
+    'users',
+    {
+        id: {
+            type: Sequelize.STRING(100),
+            primaryKey: true,
+            autoIncrement: true
+        },
+        level_id: Sequelize.INTEGER(11),
+        isadmin: Sequelize.INTEGER(1),
+        nfc_id: Sequelize.INTEGER(100),
+        username: Sequelize.STRING(100),
+        password: Sequelize.STRING(100),
+        name: Sequelize.STRING(100),
+        phonenumber: Sequelize.STRING(11),
+        remark: Sequelize.STRING(100)
+    },
+    {
+        timestamps: true
+    }
+)
+
   var Nfcs = sequelize.define(
     'nfcs',
     {
