@@ -25,6 +25,7 @@ module.exports = function (router, sequelize, logger) {
             content: Sequelize.STRING(100),
             buglevel: Sequelize.INTEGER(1),
             area_remark: Sequelize.STRING(100),
+            title_name: Sequelize.STRING(100),
         },
         {
             timestamps: true
