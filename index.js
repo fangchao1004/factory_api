@@ -22,7 +22,6 @@ const sampleInit = require('./sample')
 const smsInit = require('./sms')
 const taskInit = require('./task')
 const userInit = require('./user')
-
 //----------------------------------------------------------------------------------------------------------------
 //  增加日志文件输出
 //----------------------------------------------------------------------------------------------------------------
@@ -70,3 +69,15 @@ app.listen(3009)
 
 logger.debug('app started at port 3009...')
 
+router.post('/obs', async (ctx, next) => {
+  try {
+    // console.log("sql语句：",ctx.request.body.sql);
+    let result = await sequelize.query(ctx.request.body.sql);
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: result }
+  } catch (error) {
+    logger.debug(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'update fault' }
+  }
+})
