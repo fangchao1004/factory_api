@@ -78,6 +78,6 @@ router.post('/obs', async (ctx, next) => {
   } catch (error) {
     logger.debug(error)
     ctx.response.type = 'json'
-    ctx.response.body = { code: -1, data: 'update fault' }
+    ctx.response.body = { code: -1, data: 'operate fault' }
   }
 })
