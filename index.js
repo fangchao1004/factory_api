@@ -74,7 +74,7 @@ router.post('/obs', async (ctx, next) => {
     // console.log("sql语句：",ctx.request.body.sql);
     let result = await sequelize.query(ctx.request.body.sql);
     ctx.response.type = 'json'
-    ctx.response.body = { code: 0, data: result }
+    ctx.response.body = { code: 0, data: result[0] }
   } catch (error) {
     logger.debug(error)
     ctx.response.type = 'json'
