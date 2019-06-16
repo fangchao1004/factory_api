@@ -65,9 +65,6 @@ sampleInit(router, sequelize, logger)
 smsInit(router, sequelize, logger)
 taskInit(router, sequelize, logger)
 userInit(router, sequelize, logger)
-app.listen(3009)
-
-logger.debug('app started at port 3009...')
 
 router.post('/obs', async (ctx, next) => {
   try {
@@ -81,3 +78,6 @@ router.post('/obs', async (ctx, next) => {
     ctx.response.body = { code: -1, data: 'operate fault' }
   }
 })
+
+app.listen(3009)
+logger.debug('app started at port 3009...')

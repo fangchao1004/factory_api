@@ -20,6 +20,7 @@ module.exports = function (router, sequelize, logger) {
             },
             device_id: Sequelize.INTEGER(11),
             user_id: Sequelize.INTEGER(11),
+            major_id: Sequelize.INTEGER(11),
             fixed_user_id: Sequelize.INTEGER(11),
             status: Sequelize.INTEGER(1),
             content: Sequelize.STRING(100),
