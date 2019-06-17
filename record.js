@@ -23,6 +23,30 @@ module.exports = function (router, sequelize, logger) {
       timestamps: true
     }
   )
+  var Users = sequelize.define(
+    'users',
+    {
+      id: {
+        type: Sequelize.STRING(100),
+        primaryKey: true,
+        autoIncrement: true
+      },
+      level_id: Sequelize.INTEGER(11),
+      isadmin: Sequelize.INTEGER(1),
+      nfc_id: Sequelize.INTEGER(100),
+      username: Sequelize.STRING(100),
+      password: Sequelize.STRING(100),
+      name: Sequelize.STRING(100),
+      permission: Sequelize.STRING(100),
+      phonenumber: Sequelize.STRING(11),
+      remark: Sequelize.STRING(100)
+    },
+    {
+      timestamps: true
+    }
+  )
+  Records.belongsTo(Users, { foreignKey: 'user_id', targetKey: 'id' })
+
   router.post('/insert_record', async (ctx, next) => {
     try {
       await Records.create(ctx.request.body)
@@ -37,7 +61,8 @@ module.exports = function (router, sequelize, logger) {
   router.post('/find_record', async (ctx, next) => {
     try {
       let all = await Records.findAll({
-        where: ctx.request.body
+        where: ctx.request.body,
+        include: [{ model: Users }]
       })
       ctx.response.type = 'json'
       ctx.response.body = { code: 0, data: all }
