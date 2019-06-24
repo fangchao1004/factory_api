@@ -23,6 +23,7 @@ const sampleInit = require('./sample')
 const smsInit = require('./sms')
 const taskInit = require('./task')
 const userInit = require('./user')
+const statuscountInit = require('./statuscount')
 //----------------------------------------------------------------------------------------------------------------
 //  增加日志文件输出
 //----------------------------------------------------------------------------------------------------------------
@@ -66,6 +67,7 @@ sampleInit(router, sequelize, logger)
 smsInit(router, sequelize, logger)
 taskInit(router, sequelize, logger)
 userInit(router, sequelize, logger)
+statuscountInit(router, sequelize, logger)
 
 router.post('/obs', async (ctx, next) => {
   try {
