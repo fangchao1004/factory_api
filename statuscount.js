@@ -22,8 +22,8 @@ module.exports = function (router, sequelize, logger) {
         }
     )
     function setScheduleJob() {
-        schedule.scheduleJob('59 59 23 * * *', () => {
-            logger.debug('每天的23:59:59点触发，去更新statuscount表');
+        schedule.scheduleJob('55 59 23 * * *', () => {
+            logger.debug('每天的23:59:55点触发，去更新statuscount表');
             doAction();
         });
     }
@@ -40,7 +40,7 @@ module.exports = function (router, sequelize, logger) {
             normal_num: result[0][0].status_count,
             error_num: result[0][1].status_count,
         };
-        // console.log(dataObj);
+        // console.log(dataObj);//在一天结束的时刻 将当前的设备状态记录保存进表
         await Status_Count.create(dataObj)
     }
     setScheduleJob();// 定时器
