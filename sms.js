@@ -72,7 +72,7 @@ module.exports = function (router, sequelize, logger) {
 
     ///设置一个定时器 每天的9点触发
     function setScheduleJob() {
-        schedule.scheduleJob('0 40 14 * * *', () => {
+        schedule.scheduleJob('0 0 9 * * *', () => {
             logger.debug('每天的9点触发:' + new Date());
             checkTaskHandler()
         });
