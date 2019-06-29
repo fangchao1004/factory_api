@@ -6,15 +6,58 @@ var client = new Core({
     accessKeySecret: 'VwwbCrudDp7g2cDmk6vNBtiwcCliyV',
     endpoint: 'https://dysmsapi.aliyuncs.com',
     apiVersion: '2017-05-25'
-  });
-  
-  var requestOption = {
+});
+
+var requestOption = {
     method: 'POST'
-  };
+};
 
 module.exports = function (router, sequelize, logger) {
 
     logger.debug('Sms API Init...')
+    var Tasks = sequelize.define(
+        'tasks',
+        {
+            id: {
+                type: Sequelize.STRING(100),
+                primaryKey: true,
+                autoIncrement: true
+            },
+            from: Sequelize.INTEGER(11),
+            to: Sequelize.STRING(100),
+            status: Sequelize.INTEGER(1),
+            title: Sequelize.STRING(100),
+            content: Sequelize.STRING(100),
+            overTime: Sequelize.DOUBLE(13),
+            isMessage: Sequelize.INTEGER(1),
+            remark: Sequelize.STRING(100),
+        },
+        {
+            timestamps: true
+        }
+    )
+    var Users = sequelize.define(
+        'users',
+        {
+            id: {
+                type: Sequelize.STRING(100),
+                primaryKey: true,
+                autoIncrement: true
+            },
+            level_id: Sequelize.INTEGER(11),
+            isadmin: Sequelize.INTEGER(1),
+            nfc_id: Sequelize.INTEGER(100),
+            username: Sequelize.STRING(100),
+            password: Sequelize.STRING(100),
+            name: Sequelize.STRING(100),
+            permission: Sequelize.STRING(100),
+            phonenumber: Sequelize.STRING(11),
+            remark: Sequelize.STRING(100)
+        },
+        {
+            timestamps: true
+        }
+    )
 
     router.post('/sendMessageToStaffs', async (ctx, next) => {
         try {
@@ -80,7 +123,7 @@ module.exports = function (router, sequelize, logger) {
     async function checkTaskHandler() {
         logger.debug('开始检查');
         let currentTime = new Date().getTime();
-        // logger.debug('当前时刻', currentTime);
+        logger.debug('当前时刻', currentTime);
         ///查询出状态 未完成 且截止时间大于当前时间的 isMessage===1 符合条件的对象
         ///同时左连接上users表获取 用户的详细信息  (暂时不会左连接，后期优化)
         let allUncompleteTaskData = await Tasks.findAll({
@@ -102,10 +145,10 @@ module.exports = function (router, sequelize, logger) {
             to_Arr.forEach((item) => {
                 temp_to_arr.push({ name: item.name, phonenumber: item.phonenumber })
             })
-            // logger.debug('单个对象：',temp_to_arr);
+            logger.debug('单个对象：',temp_to_arr);
             tempArr.push({ title: item.title, name_from: from_obj.name, to: temp_to_arr });
         }
-        logger.debug(tempArr);///短信任务数组列表
+        // logger.debug("短信任务数组列表:",tempArr);///短信任务数组列表
         sendMessageToNotice(tempArr);
     }
     function sendMessageToNotice(paramsArr) {

@@ -19,6 +19,7 @@ module.exports = function (router, sequelize, logger) {
       content: Sequelize.STRING(100),
       overTime: Sequelize.DOUBLE(13),
       isMessage: Sequelize.INTEGER(1),
+      remark: Sequelize.STRING(100),
     },
     {
       timestamps: true
