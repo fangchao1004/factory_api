@@ -21,12 +21,12 @@ module.exports = function (router, sequelize, logger) {
             device_id: Sequelize.INTEGER(11),
             user_id: Sequelize.INTEGER(11),
             major_id: Sequelize.INTEGER(11),
-            fixed_user_id: Sequelize.INTEGER(11),
             status: Sequelize.INTEGER(1),
             content: Sequelize.STRING(100),
             buglevel: Sequelize.INTEGER(1),
             area_remark: Sequelize.STRING(100),
             title_name: Sequelize.STRING(100),
+            remark: Sequelize.STRING(100),
         },
         {
             timestamps: true
