@@ -90,7 +90,7 @@ module.exports = function (router, sequelize, logger) {
         const file = ctx.request.files.file; // 获取上传文件
         const reader = fs.createReadStream(file.path)
         const uuid = uuidv1()
-        let filePath = path.join(__dirname, 'public/upload/') + `/${uuid}.${file.name.split('.')[file.name.split('.').length - 1]}`;
+        let filePath = path.join(__dirname, 'public/upload/') + `/${uuid}.jpg`;
         // // 创建可写流
         const upStream = fs.createWriteStream(filePath);
         // // 可读流通过管道写入可写流
