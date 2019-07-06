@@ -42,6 +42,7 @@ module.exports = function (router, sequelize, logger) {
         };
         // console.log(dataObj);//在一天结束的时刻 将当前的设备状态记录保存进表
         await Status_Count.create(dataObj)
+        logger.debug('statuscount表新增完成');
     }
     setScheduleJob();// 定时器
 }
