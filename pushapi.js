@@ -1,5 +1,7 @@
 var GeTui = require('./GT.push');
 var Target = require('./getui/Target');
+var APNPayload = require('./payload/APNPayload');
+var DictionaryAlertMsg = require('./payload/DictionaryAlertMsg');
 var NotificationTemplate = require('./getui/template/NotificationTemplate');
 var SingleMessage = require('./getui/message/SingleMessage');
 // var HOST = 'http://sdk.open.api.igexin.com/apiex.htm';
@@ -21,6 +23,27 @@ PushApi.pushMessageToSingle = function (cid, title, text) {
         isVibrate: true,
         isClearable: true,
     })
+
+    var payload = new APNPayload();
+    var alertMsg = new DictionaryAlertMsg();
+    alertMsg.body = text;
+    alertMsg.actionLocKey = "actionLocKey";
+    alertMsg.locKey = "locKey";
+    alertMsg.locArgs = Array("locArgs");
+    alertMsg.launchImage = "launchImage";
+    //ios8.2以上版本支持
+    alertMsg.title = title;
+    alertMsg.titleLocKey = "titleLocKey";
+    alertMsg.titleLocArgs = Array("titleLocArgs");
+
+    payload.alertMsg = alertMsg;
+    payload.badge = 0;
+    payload.contentAvailable = 1;
+    payload.category = "";
+    payload.sound = "";
+    payload.customMsg.payload1 = "payload";
+    template.setApnInfo(payload);
+
     var message = new SingleMessage({
         isOffline: true,                        //是否离线
         offlineExpireTime: 3600 * 12 * 1000,    //离线时间
