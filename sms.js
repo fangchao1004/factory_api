@@ -15,6 +15,24 @@ var requestOption = {
 module.exports = function (router, sequelize, logger) {
 
     logger.debug('Sms API Init...')
+
+    var Pushs = sequelize.define(
+        'pushs',
+        {
+            id: {
+                type: Sequelize.STRING(100),
+                primaryKey: true,
+                autoIncrement: true
+            },
+            user_id: Sequelize.INTEGER(11),
+            user_name: Sequelize.STRING(100),
+            pushid: Sequelize.STRING(100)
+        },
+        {
+            timestamps: true
+        }
+    )
+    
     var Tasks = sequelize.define(
         'tasks',
         {

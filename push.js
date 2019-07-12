@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const PushApi = require('./pushapi')
 
 module.exports = function (router, sequelize, logger) {
 
@@ -48,6 +49,21 @@ module.exports = function (router, sequelize, logger) {
             let all = await Pushs.findOne({
                 where: ctx.request.body
             })
+            ctx.response.type = 'json'
+            ctx.response.body = { code: 0, data: all }
+        } catch (error) {
+            logger.error(error)
+            ctx.response.type = 'json'
+            ctx.response.body = { code: -1, data: 'find fault' }
+        }
+    })
+
+    router.post('/push_notice', async (ctx, next) => {
+        try {
+            let all = await Pushs.findOne({
+                where: {user_id: ctx.request.body.user_id}
+            })
+            if (all) PushApi.pushMessageToSingle(all.pushid, ctx.request.body.title, ctx.request.body.text)
             ctx.response.type = 'json'
             ctx.response.body = { code: 0, data: all }
         } catch (error) {
