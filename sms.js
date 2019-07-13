@@ -32,7 +32,7 @@ module.exports = function (router, sequelize, logger) {
             timestamps: true
         }
     )
-    
+
     var Tasks = sequelize.define(
         'tasks',
         {
@@ -151,44 +151,41 @@ module.exports = function (router, sequelize, logger) {
                 overTime: { $gt: currentTime }
             }
         })
-        logger.debug("符合条件的任务对象有几个:", allUncompleteTaskData.length);
+        logger.debug("符合条件的 任务对象 有几个:", allUncompleteTaskData.length);
         if (allUncompleteTaskData.length == 0) { return }
-        logger.debug('分别是：');
-        let tempArr = [];
+        let allToUserIdArr = [];
         for (let item of allUncompleteTaskData) {
-            let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item)));
-            let from_obj = await Users.findOne({ where: { id: item.from } })
-            let to_Arr = await Users.findAll({ where: { id: to_ids } })
-            let temp_to_arr = [];
-            to_Arr.forEach((item) => {
-                temp_to_arr.push({ name: item.name, phonenumber: item.phonenumber })
-            })
-            logger.debug('单个对象：',temp_to_arr);
-            tempArr.push({ title: item.title, name_from: from_obj.name, to: temp_to_arr });
+            let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item)));///每一条任务，都可能有多个执行人
+            allToUserIdArr = [...allToUserIdArr, ...to_ids]
         }
-        // logger.debug("短信任务数组列表:",tempArr);///短信任务数组列表
-        sendMessageToNotice(tempArr);
+        logger.debug('这', allUncompleteTaskData.length, '个任务中包含的所有to_user:', allToUserIdArr);
+        ///对这些人员id 进行去重复处理
+        let distinctToUserArr = unique(allToUserIdArr);
+        logger.debug('对这些人员id 进行去重复处理:', distinctToUserArr);
+        let distinctToUserInfoArr = await Users.findAll({ where: { id: distinctToUserArr } })
+        // console.log('查询到这些人员的信息:', distinctToUserInfoArr.length);
+        //发生短信
+        sendMessageToNotice(distinctToUserInfoArr);
+    }
+    function unique(arr) {
+        return Array.from(new Set(arr))
     }
     function sendMessageToNotice(paramsArr) {
-        paramsArr.forEach((item, index) => {
-            // logger.debug('任务', index, '详情', item);
-            // logger.debug('任务', index, '主题', item.title,'发起人',item.name_from);
-            item.to.forEach((element) => {
-                logger.debug('所有待发短信：主题', item.title, '发起人', item.name_from, '执行人', element.name, '执行人手机', element.phonenumber);
-                let params = {
-                    "PhoneNumbers": element.phonenumber,
-                    "SignName": "中节能合肥",
-                    "TemplateCode": "SMS_166096679",
-                    "TemplateParam": JSON.stringify({ name_from: item.name_from, name: element.name, title: item.title })
-                }
-                client.request('SendSms', params, requestOption).then((result) => {
-                    logger.debug(result);
-                }, (ex) => {
-                    logger.debug(ex);
-                })
+        paramsArr.forEach((oneUser) => {
+            // console.log(oneUser.name, oneUser.phonenumber);
+            let params = {
+                "PhoneNumbers": oneUser.phonenumber,
+                "SignName": "中节能合肥",
+                "TemplateCode": "SMS_170347285",
+                "TemplateParam": JSON.stringify({ name: oneUser.name })
+            }
+            client.request('SendSms', params, requestOption).then((result) => {
+                logger.debug(result);
+            }, (ex) => {
+                logger.debug(ex);
             })
+
         })
     }
-
     setScheduleJob() // 定时器
 }
