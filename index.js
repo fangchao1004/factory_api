@@ -56,6 +56,11 @@ var sequelize = new Sequelize(
   }
 )
 
+router.get('/version_update', async (ctx, next) => {
+  ctx.response.type = 'json'
+  ctx.response.body = { code: 0, vn: '0.0.3' }
+})
+
 areaInit(router, sequelize, logger)
 bugInit(router, sequelize, logger)
 deviceInit(router, sequelize, logger)
