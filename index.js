@@ -129,7 +129,7 @@ router.post('/getEveryUserRecordToday', async (ctx, next) => {
 })
 
 /**
- * 查找那些关于我的没有完成的缺陷
+ * 查找那些关于我的缺陷
  */
 router.post('/findBugsAboutMe', async (ctx, next) => {
   try {
