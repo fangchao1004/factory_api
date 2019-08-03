@@ -186,7 +186,16 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
   try {
     let currentUserId = parseInt(ctx.request.body.userId);
     let isCompleted = parseInt(ctx.request.body.isCompleted);
-    let sqlText = `select * from bugs where remark like '%"from":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4
+    let sqlText = `
+    select * from
+    (select bugs.*,des.name as device_name,urs.name as user_name,mjs.name as major_name,areas.name as area_name from bugs
+        left join devices des on bugs.device_id = des.id
+        left join users urs on bugs.user_id = urs.id
+        left join majors mjs on bugs.major_id = mjs.id
+        left join areas on des.area_id = areas.id
+        ) t1
+    where
+    remark like '%"from":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4
     or remark like '%"to":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4`
     let result = await sequelize.query(sqlText);
     ctx.response.type = 'json'
