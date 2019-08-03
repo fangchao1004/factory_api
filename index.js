@@ -131,6 +131,7 @@ router.post('/getEveryUserRecordToday', async (ctx, next) => {
 /**
  * 查找那些关于我的缺陷
  */
+/*
 router.post('/findBugsAboutMe', async (ctx, next) => {
   try {
     let currentUserId = parseInt(ctx.request.body.userId);
@@ -143,7 +144,7 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
     replace(json_extract( bugs.remark , '$."2"[*].from'),' ','') as "2_from",
     replace(json_extract( bugs.remark , '$."3"[*].from'),' ','') as "3_from"
     from bugs
-    where effective = 1 and status ${isCompleted===0?`!=`:`=`} 4`
+    where effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4`
     // console.log("sql语句：",ctx.request.body.sql);
     let result = await sequelize.query(sqlText);
     // console.log('result:', result[0]);
@@ -151,11 +152,11 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
     result[0].forEach((oneBugInfo) => {
       // console.log('aaa', oneBugInfo);
       let allUserIdArr = [];
-      if (oneBugInfo['0_from']) {allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['0_from'])]}
-      if (oneBugInfo['0_to']) {allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['0_to'])]}
-      if (oneBugInfo['1_from']) {allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['1_from'])]}
-      if (oneBugInfo['2_from']) {allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['2_from'])]}
-      if (oneBugInfo['3_from']) {allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['3_from'])]}
+      if (oneBugInfo['0_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['0_from'])] }
+      if (oneBugInfo['0_to']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['0_to'])] }
+      if (oneBugInfo['1_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['1_from'])] }
+      if (oneBugInfo['2_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['2_from'])] }
+      if (oneBugInfo['3_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['3_from'])] }
       oneBugInfo.exist_user_id = unique(allUserIdArr);///去重复
       delete oneBugInfo['0_from']
       delete oneBugInfo['0_to']
@@ -163,7 +164,7 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
       delete oneBugInfo['2_from']
       delete oneBugInfo['3_from']
       // console.log('去重复后数据：',oneBugInfo);
-      if(oneBugInfo.exist_user_id.indexOf(currentUserId)!==-1){
+      if (oneBugInfo.exist_user_id.indexOf(currentUserId) !== -1) {
         // console.log(oneBugInfo);
         finallyResult.push(oneBugInfo);
       }
@@ -172,6 +173,25 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
     ctx.response.body = { code: 0, data: finallyResult }
   } catch (error) {
     logger.debug(error)
+    ctx.response.type = 'json'
+    ctx.response.body = { code: -1, data: 'operate fault' }
+  }
+})
+*/
+
+/**
+ * 查找那些关于我的缺陷
+ */
+router.post('/findBugsAboutMe', async (ctx, next) => {
+  try {
+    let currentUserId = parseInt(ctx.request.body.userId);
+    let isCompleted = parseInt(ctx.request.body.isCompleted);
+    let sqlText = `select * from bugs where remark like '%"from":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4
+    or remark like '%"to":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4`
+    let result = await sequelize.query(sqlText);
+    ctx.response.type = 'json'
+    ctx.response.body = { code: 0, data: result[0] }
+  } catch (error) {
     ctx.response.type = 'json'
     ctx.response.body = { code: -1, data: 'operate fault' }
   }
