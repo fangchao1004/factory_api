@@ -23,13 +23,29 @@ module.exports = function (router, sequelize, logger) {
             timestamps: true
         }
     )
+    var Bugs_Count = sequelize.define(
+        'bugs_counts',
+        {
+            id: {
+                type: Sequelize.STRING(100),
+                primaryKey: true,
+                autoIncrement: true
+            },
+            total_num: Sequelize.INTEGER(11),
+            close_num: Sequelize.INTEGER(11),
+        },
+        {
+            timestamps: true
+        }
+    )
     function setScheduleJob() {
         schedule.scheduleJob('55 59 23 * * *', () => {
-            logger.debug('每天的23:59:55点触发，去更新statuscount表'); ///一定要在当天的末尾
-            doAction();
+            logger.debug('每天的23:59:55点触发，去更新statuscount表 和 bugs_counts表'); ///一定要在当天的末尾
+            insertStatusCount();
+            insertBugsCount();
         });
     }
-    async function doAction() {
+    async function insertStatusCount() {
         let sqlText1 = 'select des.status,count(des.status) as status_count from devices des group by des.status';
         let result = await sequelize.query(sqlText1);
         let allCount = 0;
@@ -52,6 +68,25 @@ module.exports = function (router, sequelize, logger) {
         // console.log(dataObj);//在一天结束的时刻 将当前的设备状态记录保存进表
         await Status_Count.create(dataObj)
         logger.debug('statuscount表新增完成');
+    }
+    async function insertBugsCount() {
+        /// 获取今日解决的bug数量
+        let todayStart = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        let todayEnd = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+        let sql1 = `select count(*) count from bugs
+        where closedAt>'${todayStart}' and closedAt<'${todayEnd}'`
+        let todayCloseBugNum = await sequelize.query(sql1);
+        /// 获取今日创建的bug总数量
+        let sql2 = `select count(*) count from bugs
+            where createdAt>'${todayStart}' and createdAt<'${todayEnd}'`
+        let todayBugNum = await sequelize.query(sql2);
+        let dataObj = {
+            close_num: todayCloseBugNum[0][0].count,
+            total_num: todayBugNum[0][0].count
+        }
+        // console.log('dasdadasdas:', dataObj);
+        await Bugs_Count.create(dataObj)
+        logger.debug('bugscount表新增完成');
     }
     setScheduleJob();// 定时器
 }
