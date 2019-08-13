@@ -19,8 +19,7 @@ module.exports = function (router, sequelize, logger) {
     logger.debug('Sms API Init...')
 
     var Pushs = sequelize.define(
-        'pushs',
-        {
+        'pushs', {
             id: {
                 type: Sequelize.STRING(100),
                 primaryKey: true,
@@ -29,15 +28,13 @@ module.exports = function (router, sequelize, logger) {
             user_id: Sequelize.INTEGER(11),
             user_name: Sequelize.STRING(100),
             pushid: Sequelize.STRING(100)
-        },
-        {
+        }, {
             timestamps: true
         }
     )
 
     var Tasks = sequelize.define(
-        'tasks',
-        {
+        'tasks', {
             id: {
                 type: Sequelize.STRING(100),
                 primaryKey: true,
@@ -52,14 +49,12 @@ module.exports = function (router, sequelize, logger) {
             overTime: Sequelize.DOUBLE(13),
             isMessage: Sequelize.INTEGER(1),
             remark: Sequelize.STRING(100),
-        },
-        {
+        }, {
             timestamps: true
         }
     )
     var Users = sequelize.define(
-        'users',
-        {
+        'users', {
             id: {
                 type: Sequelize.STRING(100),
                 primaryKey: true,
@@ -75,8 +70,7 @@ module.exports = function (router, sequelize, logger) {
             permission: Sequelize.STRING(100),
             phonenumber: Sequelize.STRING(11),
             remark: Sequelize.STRING(100)
-        },
-        {
+        }, {
             timestamps: true
         }
     )
@@ -101,11 +95,17 @@ module.exports = function (router, sequelize, logger) {
                 })
             });
             ctx.response.type = 'json'
-            ctx.response.body = { code: 0, data: 'update success' }
+            ctx.response.body = {
+                code: 0,
+                data: 'update success'
+            }
         } catch (error) {
             logger.debug(error)
             ctx.response.type = 'json'
-            ctx.response.body = { code: -1, data: 'update fault' }
+            ctx.response.body = {
+                code: -1,
+                data: 'update fault'
+            }
         }
     })
 
@@ -127,11 +127,17 @@ module.exports = function (router, sequelize, logger) {
                 logger.debug(ex);
             })
             ctx.response.type = 'json'
-            ctx.response.body = { code: 0, data: 'update success' }
+            ctx.response.body = {
+                code: 0,
+                data: 'update success'
+            }
         } catch (error) {
             logger.debug(error)
             ctx.response.type = 'json'
-            ctx.response.body = { code: -1, data: 'update fault' }
+            ctx.response.body = {
+                code: -1,
+                data: 'update fault'
+            }
         }
     })
 
@@ -139,8 +145,8 @@ module.exports = function (router, sequelize, logger) {
     function setScheduleJob() {
         schedule.scheduleJob('0 0 9 * * *', () => {
             logger.debug('每天的9点触发:' + new Date());
-            checkTaskHandler();///短信通知
-            checkTaskHandlerToNoticeApp();///app通知
+            checkTaskHandler(); ///短信通知
+            checkTaskHandlerToNoticeApp(); ///app通知
         });
     }
     async function checkTaskHandler() {
@@ -153,28 +159,39 @@ module.exports = function (router, sequelize, logger) {
             where: {
                 status: 0,
                 isMessage: 1,
-                overTime: { $gt: currentTime }
+                effective: 1,
+                overTime: {
+                    $gt: currentTime
+                }
             }
         })
         logger.debug("符合条件的 任务对象（短信通知） 有几个:", allUncompleteTaskData.length);
-        if (allUncompleteTaskData.length == 0) { return }
+        if (allUncompleteTaskData.length == 0) {
+            return
+        }
         let allToUserIdArr = [];
         for (let item of allUncompleteTaskData) {
-            let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item)));///每一条任务，都可能有多个执行人
+            let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item))); ///每一条任务，都可能有多个执行人
             allToUserIdArr = [...allToUserIdArr, ...to_ids]
         }
         logger.debug('这', allUncompleteTaskData.length, '个任务中包含的所有to_user:', allToUserIdArr);
         ///对这些人员id 进行去重复处理
         let distinctToUserArr = unique(allToUserIdArr);
         logger.debug('对这些人员id 进行去重复处理:', distinctToUserArr);
-        let distinctToUserInfoArr = await Users.findAll({ where: { id: distinctToUserArr } })
+        let distinctToUserInfoArr = await Users.findAll({
+            where: {
+                id: distinctToUserArr
+            }
+        })
         // console.log('查询到这些人员的信息:', distinctToUserInfoArr.length);
         //发生短信
         sendMessageToNotice(distinctToUserInfoArr);
     }
+
     function unique(arr) {
         return Array.from(new Set(arr))
     }
+
     function sendMessageToNotice(paramsArr) {
         paramsArr.forEach((oneUser) => {
             // console.log(oneUser.name, oneUser.phonenumber);
@@ -183,7 +200,9 @@ module.exports = function (router, sequelize, logger) {
                 "PhoneNumbers": oneUser.phonenumber,
                 "SignName": "中节能合肥",
                 "TemplateCode": "SMS_170347285",
-                "TemplateParam": JSON.stringify({ name: oneUser.name })
+                "TemplateParam": JSON.stringify({
+                    name: oneUser.name
+                })
             }
             client.request('SendSms', params, requestOption).then((result) => {
                 logger.debug(result);
@@ -198,15 +217,20 @@ module.exports = function (router, sequelize, logger) {
         let allUncompleteTaskData = await Tasks.findAll({
             where: {
                 status: 0,
-                overTime: { $gt: currentTime }
+                effective: 1,
+                overTime: {
+                    $gt: currentTime
+                }
             }
         })
         logger.debug("符合条件的 任务对象（app通知） 有几个:", allUncompleteTaskData.length);
-        if (allUncompleteTaskData.length == 0) { return }
+        if (allUncompleteTaskData.length == 0) {
+            return
+        }
         let allToUserIdArr = [];
         for (let item of allUncompleteTaskData) {
             // console.log('item:',item);
-            let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item)));///每一条任务，都可能有多个执行人
+            let to_ids = item.to.substring(1, item.to.length - 1).split(',').map((item) => (parseInt(item))); ///每一条任务，都可能有多个执行人
             allToUserIdArr = [...allToUserIdArr, ...to_ids]
         }
         logger.debug('这', allUncompleteTaskData.length, '个任务中包含的所有to_user:', allToUserIdArr);
@@ -217,7 +241,9 @@ module.exports = function (router, sequelize, logger) {
         for (const userId of distinctToUserArr) {
             // console.log('userId:', userId);
             let all = await Pushs.findOne({
-                where: { user_id: userId }
+                where: {
+                    user_id: userId
+                }
             })
             if (all) PushApi.pushMessageToSingle(all.pushid, '任务提醒', '您还有任务没有完成，请及时处理')
         }
