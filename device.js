@@ -12,6 +12,7 @@ module.exports = function (router, sequelize, logger) {
         primaryKey: true,
         autoIncrement: true
       },
+      effective: Sequelize.INTEGER(1),
       nfc_id: Sequelize.INTEGER(11),
       name: Sequelize.STRING(100),
       remark: Sequelize.STRING(100),

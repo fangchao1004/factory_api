@@ -12,6 +12,7 @@ module.exports = function (router, sequelize, logger) {
         primaryKey: true,
         autoIncrement: true
       },
+      effective: Sequelize.INTEGER(1),
       from: Sequelize.INTEGER(11),
       to: Sequelize.STRING(100),
       status: Sequelize.INTEGER(1),
@@ -20,7 +21,6 @@ module.exports = function (router, sequelize, logger) {
       overTime: Sequelize.DOUBLE(13),
       isMessage: Sequelize.INTEGER(1),
       remark: Sequelize.STRING(100),
-      effective: Sequelize.INTEGER(1),
     },
     {
       timestamps: true

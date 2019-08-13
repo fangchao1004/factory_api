@@ -12,6 +12,7 @@ module.exports = function (router, sequelize, logger) {
         primaryKey: true,
         autoIncrement: true
       },
+      effective: Sequelize.INTEGER(1),
       device_status: Sequelize.INTEGER(11),
       device_id: Sequelize.INTEGER(11),
       device_type_id: Sequelize.INTEGER(11),
@@ -31,6 +32,7 @@ module.exports = function (router, sequelize, logger) {
         primaryKey: true,
         autoIncrement: true
       },
+      effective: Sequelize.INTEGER(1),
       level_id: Sequelize.INTEGER(11),
       isadmin: Sequelize.INTEGER(1),
       nfc_id: Sequelize.INTEGER(100),

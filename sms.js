@@ -43,6 +43,7 @@ module.exports = function (router, sequelize, logger) {
                 primaryKey: true,
                 autoIncrement: true
             },
+            effective: Sequelize.INTEGER(1),
             from: Sequelize.INTEGER(11),
             to: Sequelize.STRING(100),
             status: Sequelize.INTEGER(1),
@@ -64,6 +65,7 @@ module.exports = function (router, sequelize, logger) {
                 primaryKey: true,
                 autoIncrement: true
             },
+            effective: Sequelize.INTEGER(1),
             level_id: Sequelize.INTEGER(11),
             isadmin: Sequelize.INTEGER(1),
             nfc_id: Sequelize.INTEGER(100),
