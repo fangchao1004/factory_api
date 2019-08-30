@@ -14,6 +14,7 @@ module.exports = function (router, sequelize, logger) {
             },
             effective: Sequelize.INTEGER(1),
             level_id: Sequelize.INTEGER(11),
+            group_id: Sequelize.INTEGER(1),
             isadmin: Sequelize.INTEGER(1),
             nfc_id: Sequelize.INTEGER(100),
             username: Sequelize.STRING(100),
