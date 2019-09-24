@@ -21,6 +21,7 @@ module.exports = function (router, sequelize, logger) {
       overTime: Sequelize.DOUBLE(13),
       isMessage: Sequelize.INTEGER(1),
       remark: Sequelize.STRING(100),
+      step_remark: Sequelize.STRING(100),
     },
     {
       timestamps: true
