@@ -26,7 +26,6 @@ module.exports = function (router, sequelize, logger) {
             content: Sequelize.STRING(100),
             buglevel: Sequelize.INTEGER(1),
             area_remark: Sequelize.STRING(100),
-            area_id: Sequelize.INTEGER(11),
             title_name: Sequelize.STRING(100),
             remark: Sequelize.STRING(100),
             closedAt: Sequelize.STRING(100),
