@@ -187,11 +187,17 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
     let isCompleted = parseInt(ctx.request.body.isCompleted);
     let sqlText = `
     select * from
-    (select bugs.*,des.name as device_name,urs.name as user_name,mjs.name as major_name,areas.name as area_name from bugs
+    (select bugs.*,des.name as device_name,urs.name as user_name,mjs.name as major_name,
+      concat_ws('/',area_1.name,area_2.name,area_3.name) as area_name,
+      bug_types.name as bug_type_name
+      from bugs
         left join devices des on bugs.device_id = des.id
         left join users urs on bugs.user_id = urs.id
         left join majors mjs on bugs.major_id = mjs.id
-        left join areas on des.area_id = areas.id
+        left join (select * from area_3 where effective = 1) area_3 on des.area_id = area_3.id
+        left join (select * from area_2 where effective = 1) area_2 on area_3.area2_id = area_2.id
+        left join (select * from area_1 where effective = 1) area_1 on area_2.area1_id = area_1.id
+        left join (select * from bug_types where effective = 1) bug_types on bug_types.id = bugs.bug_type_id
         ) t1
     where
     remark like '%"from":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4
