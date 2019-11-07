@@ -29,6 +29,7 @@ module.exports = function (router, sequelize, logger) {
             title_name: Sequelize.STRING(100),
             title_remark: Sequelize.STRING(100),
             bug_type_id: Sequelize.INTEGER(11),
+            last_remark: Sequelize.STRING(100),
             remark: Sequelize.STRING(100),
             closedAt: Sequelize.STRING(100),
             checkedAt: Sequelize.STRING(100),
