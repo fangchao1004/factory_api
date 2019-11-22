@@ -19,6 +19,7 @@ module.exports = function (router, sequelize, logger) {
       type_id: Sequelize.INTEGER(11),
       area_id: Sequelize.INTEGER(11),
       status: Sequelize.INTEGER(11),
+      switch: Sequelize.INTEGER(1),
     },
     {
       timestamps: true
