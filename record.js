@@ -20,6 +20,7 @@ module.exports = function (router, sequelize, logger) {
       content: Sequelize.STRING(100),
       user_id: Sequelize.INTEGER(11),
       checkedAt: Sequelize.STRING(100),
+      switch: Sequelize.INTEGER(1),
     },
     {
       timestamps: true
