@@ -22,6 +22,7 @@ const sampleInit = require('./sample')
 const smsInit = require('./sms')
 const taskInit = require('./task')
 const userInit = require('./user')
+const buglevelInit = require('./buglevel')
 const statuscountInit = require('./statuscount')
 const push = require('./push')
 //----------------------------------------------------------------------------------------------------------------
@@ -74,6 +75,7 @@ taskInit(router, sequelize, logger)
 userInit(router, sequelize, logger)
 statuscountInit(router, sequelize, logger)
 push(router, sequelize, logger)
+buglevelInit(router, sequelize, logger)
 
 router.post('/obs', async (ctx, next) => {
   try {
