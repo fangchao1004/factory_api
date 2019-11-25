@@ -22,7 +22,8 @@ module.exports = function (router, sequelize, logger) {
             name: Sequelize.STRING(100),
             permission: Sequelize.STRING(100),
             phonenumber: Sequelize.STRING(11),
-            remark: Sequelize.STRING(100)
+            remark: Sequelize.STRING(100),
+            isGroupLeader: Sequelize.INTEGER(1),
         },
         {
             timestamps: true
