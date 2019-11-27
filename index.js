@@ -187,6 +187,12 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
   try {
     let currentUserId = parseInt(ctx.request.body.userId);
     let isCompleted = parseInt(ctx.request.body.isCompleted);
+    let marjor_id = parseInt(ctx.request.body.major_id); /// 要么存在 要么 NaN
+    let buglevel = parseInt(ctx.request.body.buglevel); /// 要么存在 要么 NaN
+    let bug_type_id = parseInt(ctx.request.body.bug_type_id); /// 要么存在 要么 NaN
+    let marjorStr = marjor_id ? `and major_id = ${marjor_id} ` : ``
+    let buglevelStr = buglevel ? `and buglevel = ${buglevel} ` : ``
+    let bugTypeStr = bug_type_id ? `and bug_type_id = ${bug_type_id} ` : ``
     let sqlText = `
     select * from
     (select bugs.*,des.name as device_name,urs.name as user_name,mjs.name as major_name,
@@ -202,8 +208,9 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
         left join (select * from bug_types where effective = 1) bug_types on bug_types.id = bugs.bug_type_id
         ) t1
     where
-    remark like '%"from":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4
-    or remark like '%"to":[%,${currentUserId},%]%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4`
+    remark like '%"from":${currentUserId},%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4 ${marjorStr} ${buglevelStr} ${bugTypeStr}
+    or remark like '%"to":[%,${currentUserId},%]%' and  effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4 ${marjorStr} ${buglevelStr} ${bugTypeStr}
+    `
     let result = await sequelize.query(sqlText);
     ctx.response.type = 'json'
     ctx.response.body = { code: 0, data: result[0] }
