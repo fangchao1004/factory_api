@@ -46,7 +46,8 @@ module.exports = function (router, sequelize, logger) {
         });
     }
     async function insertStatusCount() {
-        let sqlText1 = 'select des.status,count(des.status) as status_count from devices des group by des.status';
+        logger.debug('插入StatusCount表');
+        let sqlText1 = `select des.status,count(des.status) as status_count from devices des where des.effective = 1 group by des.status`;
         let result = await sequelize.query(sqlText1);
         let allCount = 0;
         result[0].forEach((item) => {
@@ -54,10 +55,9 @@ module.exports = function (router, sequelize, logger) {
         })
         let startOfToday = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
         let endOfToday = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
-        let sql1 = ' select count(*) as todayDetectCount  from (select distinct rds.device_id from records rds'
-        let sql2 = ' where rds.createdAt > "' + startOfToday + '" and rds.createdAt < "' + endOfToday + '") t1 ';
-        let sqlText2 = sql1 + sql2;
-        let result2 = await sequelize.query(sqlText2);
+        let sql = `select count(*) as todayDetectCount  from (select distinct rds.device_id from records rds
+            where rds.createdAt > '${startOfToday}'and rds.createdAt < '${endOfToday}' and rds.effective = 1) t1`
+        let result2 = await sequelize.query(sql);
         ///将当前结果插入到statuscount表中
         let dataObj = {
             total_num: allCount,
@@ -70,15 +70,16 @@ module.exports = function (router, sequelize, logger) {
         logger.debug('statuscount表新增完成');
     }
     async function insertBugsCount() {
+        logger.debug('插入bugscount表');
         /// 获取今日解决的bug数量
         let todayStart = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
         let todayEnd = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
         let sql1 = `select count(*) count from bugs
-        where closedAt>'${todayStart}' and closedAt<'${todayEnd}'`
+        where closedAt>'${todayStart}' and closedAt<'${todayEnd}' and effective = 1`
         let todayCloseBugNum = await sequelize.query(sql1);
         /// 获取今日创建的bug总数量
         let sql2 = `select count(*) count from bugs
-            where createdAt>'${todayStart}' and createdAt<'${todayEnd}'`
+            where createdAt>'${todayStart}' and createdAt<'${todayEnd}' and effective = 1`
         let todayBugNum = await sequelize.query(sql2);
         let dataObj = {
             close_num: todayCloseBugNum[0][0].count,

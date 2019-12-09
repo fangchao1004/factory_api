@@ -99,10 +99,12 @@ router.post('/getEveryUserRecordToday', async (ctx, next) => {
     // console.log(dayOfBegin, dayOfEnd);
     let sqlText1 = `select tt1.*,users.name,des.id as device_id from
       devices des, (select rds.user_id from records rds 
-      where createdAt>'${dayOfBegin}' and createdAt<'${dayOfEnd}' and effective = 1 group by rds.user_id) tt1 left join users on tt1.user_id = users.id`
+      where createdAt>'${dayOfBegin}' and createdAt<'${dayOfEnd}' and effective = 1 group by rds.user_id) tt1 
+      left join (select * from users) users on tt1.user_id = users.id
+      where des.effective = 1`
     let result = await sequelize.query(sqlText1);
     ctx.response.type = 'json'
-    // console.log('返回值', result[0]);///得到的返回值 是[{user_id:x,device_id:y},...]集合数组
+    // console.log('返回值', result[0].length);///得到的返回值 是[{user_id:x,device_id:y},...]集合数组
     let resultArr = [];
     if (result[0].length > 0) {
       for (const item of result[0]) {
@@ -128,57 +130,6 @@ router.post('/getEveryUserRecordToday', async (ctx, next) => {
     ctx.response.body = { code: -1, data: 'operate fault' }
   }
 })
-
-/**
- * 查找那些关于我的缺陷
- */
-/*
-router.post('/findBugsAboutMe', async (ctx, next) => {
-  try {
-    let currentUserId = parseInt(ctx.request.body.userId);
-    let isCompleted = parseInt(ctx.request.body.isCompleted);
-    let sqlText = `select
-    bugs.*,
-    replace(json_extract( bugs.remark , '$."0"[*].from'),' ','') as "0_from",
-    replace(json_extract( bugs.remark , '$."0"[*].to'),' ','') as "0_to",
-    replace(json_extract( bugs.remark , '$."1"[*].from'),' ','') as "1_from",
-    replace(json_extract( bugs.remark , '$."2"[*].from'),' ','') as "2_from",
-    replace(json_extract( bugs.remark , '$."3"[*].from'),' ','') as "3_from"
-    from bugs
-    where effective = 1 and status ${isCompleted === 0 ? `!=` : `=`} 4`
-    // console.log("sql语句：",ctx.request.body.sql);
-    let result = await sequelize.query(sqlText);
-    // console.log('result:', result[0]);
-    let finallyResult = [];
-    result[0].forEach((oneBugInfo) => {
-      // console.log('aaa', oneBugInfo);
-      let allUserIdArr = [];
-      if (oneBugInfo['0_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['0_from'])] }
-      if (oneBugInfo['0_to']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['0_to'])] }
-      if (oneBugInfo['1_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['1_from'])] }
-      if (oneBugInfo['2_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['2_from'])] }
-      if (oneBugInfo['3_from']) { allUserIdArr = [...allUserIdArr, ...JSON.parse(oneBugInfo['3_from'])] }
-      oneBugInfo.exist_user_id = unique(allUserIdArr);///去重复
-      delete oneBugInfo['0_from']
-      delete oneBugInfo['0_to']
-      delete oneBugInfo['1_from']
-      delete oneBugInfo['2_from']
-      delete oneBugInfo['3_from']
-      // console.log('去重复后数据：',oneBugInfo);
-      if (oneBugInfo.exist_user_id.indexOf(currentUserId) !== -1) {
-        // console.log(oneBugInfo);
-        finallyResult.push(oneBugInfo);
-      }
-    })
-    ctx.response.type = 'json'
-    ctx.response.body = { code: 0, data: finallyResult }
-  } catch (error) {
-    logger.debug(error)
-    ctx.response.type = 'json'
-    ctx.response.body = { code: -1, data: 'operate fault' }
-  }
-})
-*/
 
 /**
  * 查找那些关于我的缺陷
@@ -223,7 +174,6 @@ router.post('/findBugsAboutMe', async (ctx, next) => {
 function unique(arr) {
   return Array.from(new Set(arr))
 }
-
 
 app.listen(3008)
 logger.debug('app started at port 3008...')

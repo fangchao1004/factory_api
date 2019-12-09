@@ -3,7 +3,7 @@ const Sequelize = require('sequelize')
 module.exports = function (router, sequelize, logger) {
 
     logger.debug('Bug_Levels And Bug_Types API Init...')
-    console.log('Bug_Levels And Bug_Types API Init...')
+    // console.log('Bug_Levels And Bug_Types API Init...')
 
     var Bug_Levels = sequelize.define(
         'bug_levels',
