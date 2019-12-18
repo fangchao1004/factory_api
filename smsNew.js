@@ -39,7 +39,7 @@ module.exports = function (router, sequelize, logger) {
                 code: 0,
                 data: 'update success'
             }
-        } catch{
+        } catch (error) {
             ctx.response.type = 'json'
             ctx.response.body = {
                 code: -1,
