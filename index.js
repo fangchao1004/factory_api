@@ -25,6 +25,7 @@ const userInit = require('./user')
 const buglevelInit = require('./buglevel')
 const statuscountInit = require('./statuscount')
 const push = require('./push')
+const smsNewInit = require('./smsNew')
 //----------------------------------------------------------------------------------------------------------------
 //  增加日志文件输出
 //----------------------------------------------------------------------------------------------------------------
@@ -76,6 +77,7 @@ userInit(router, sequelize, logger)
 statuscountInit(router, sequelize, logger)
 push(router, sequelize, logger)
 buglevelInit(router, sequelize, logger)
+smsNewInit(router, sequelize, logger);
 
 router.post('/obs', async (ctx, next) => {
   try {

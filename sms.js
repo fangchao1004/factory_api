@@ -13,11 +13,8 @@ var client = new Core({
 var requestOption = {
     method: 'POST'
 };
-
 module.exports = function (router, sequelize, logger) {
-
     logger.debug('Sms API Init...')
-
     var Pushs = sequelize.define(
         'pushs', {
             id: {
@@ -211,6 +208,7 @@ module.exports = function (router, sequelize, logger) {
             })
         })
     }
+
     ////app通知的区别在于不要考虑 Tasks 的 isMessage字段。
     async function checkTaskHandlerToNoticeApp() {
         let currentTime = new Date().getTime();
