@@ -1,11 +1,6 @@
 const Core = require('@alicloud/pop-core');
-
-var client = new Core({
-    accessKeyId: 'LTAIKlkSwGRxGUs2',
-    accessKeySecret: 'VwwbCrudDp7g2cDmk6vNBtiwcCliyV',
-    endpoint: 'https://dysmsapi.aliyuncs.com',
-    apiVersion: '2017-05-25'
-});
+const { messConfig } = require('./util/AccessInfo')
+var client = new Core(messConfig);
 
 var requestOption = {
     method: 'POST'

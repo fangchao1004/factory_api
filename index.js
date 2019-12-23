@@ -26,6 +26,7 @@ const buglevelInit = require('./buglevel')
 const statuscountInit = require('./statuscount')
 const push = require('./push')
 const smsNewInit = require('./smsNew')
+const { findDurtion } = require('./util/Tool')
 //----------------------------------------------------------------------------------------------------------------
 //  增加日志文件输出
 //----------------------------------------------------------------------------------------------------------------
@@ -98,12 +99,25 @@ router.post('/getEveryUserRecordToday', async (ctx, next) => {
     // console.log("sql语句：",ctx.request.body.sql);
     let dayOfBegin = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');///今日启始时刻
     let dayOfEnd = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');///今日结束时刻
-    // console.log(dayOfBegin, dayOfEnd);
-    let sqlText1 = `select tt1.*,users.name,des.id as device_id from
-      devices des, (select rds.user_id from records rds 
-      where createdAt>'${dayOfBegin}' and createdAt<'${dayOfEnd}' and effective = 1 group by rds.user_id) tt1 
-      left join (select * from users) users on tt1.user_id = users.id
-      where des.effective = 1`
+    /// 首先根据当前时间，和巡检时间表，得出当前哪些设备应该被巡检
+    let getAllowTimeListSql = `select allow_time.id,allow_time.begin,allow_time.end,allow_time.isCross,allow_time.name from allow_time where allow_time.effective = 1`
+    let allowTimeListresult = await sequelize.query(getAllowTimeListSql);
+    let currentTimeDurtion = findDurtion(allowTimeListresult[0])///查询到当前时间段 对应的时间区间表数据
+
+    ////原先 的查询sql语句，所有device , 
+    // let sqlText1 = `select tt1.*,users.name,des.id as device_id from
+    //   devices des, (select rds.user_id from records rds 
+    //   where createdAt>'${dayOfBegin}' and createdAt<'${dayOfEnd}' and effective = 1 group by rds.user_id) tt1 
+    //   left join (select * from users) users on tt1.user_id = users.id
+    //   where des.effective = 1`
+
+    /// 新的 查询sql语句 ，根据时间段查询对应的device
+    let sqlText1 = `select tt1.*,users.name,des.device_id as device_id from
+     (select a_m_d.device_id,a_m_d.effective from allow_time a_t
+     left join (select * from allowTime_map_device where effective = 1) a_m_d on a_t.id = a_m_d.allow_time_id
+     where a_t.id = ${currentTimeDurtion.id}) des, (select rds.user_id from records rds 
+     where createdAt>'${dayOfBegin}' and createdAt<'${dayOfEnd}' and effective = 1 group by rds.user_id) tt1 
+     left join (select * from users) users on tt1.user_id = users.id`
     let result = await sequelize.query(sqlText1);
     ctx.response.type = 'json'
     // console.log('返回值', result[0].length);///得到的返回值 是[{user_id:x,device_id:y},...]集合数组

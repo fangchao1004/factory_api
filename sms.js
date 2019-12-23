@@ -2,14 +2,9 @@ const Sequelize = require('sequelize')
 const schedule = require('node-schedule');
 const Core = require('@alicloud/pop-core');
 const PushApi = require('./pushapi');
+const { messConfig } = require('./util/AccessInfo')
 
-var client = new Core({
-    accessKeyId: 'LTAIKlkSwGRxGUs2',
-    accessKeySecret: 'VwwbCrudDp7g2cDmk6vNBtiwcCliyV',
-    endpoint: 'https://dysmsapi.aliyuncs.com',
-    apiVersion: '2017-05-25'
-});
-
+var client = new Core(messConfig);
 var requestOption = {
     method: 'POST'
 };
