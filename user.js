@@ -21,6 +21,7 @@ module.exports = function (router, sequelize, logger) {
             password: Sequelize.STRING(100),
             name: Sequelize.STRING(100),
             permission: Sequelize.STRING(100),
+            major_id: Sequelize.STRING(100),
             phonenumber: Sequelize.STRING(11),
             remark: Sequelize.STRING(100),
             isGroupLeader: Sequelize.INTEGER(1),
