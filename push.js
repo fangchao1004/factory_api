@@ -64,11 +64,10 @@ module.exports = function (router, sequelize, logger) {
      */
     router.post('/push_notice', async (ctx, next) => {
         try {
-            let params = [];
-            if (typeof (ctx.request.body.user_id) === 'number') { params.push(ctx.request.body.user_id) }
             let all = await Pushs.findAll({
                 where: { user_id: ctx.request.body.user_id }
             }) /// 获取相关人员的pushid
+            console.log('user_id:', ctx.request.body.user_id)
             console.log('查询到这几个', all.length)
             if (all) {
                 for (let i = 0; i < all.length; i++) {

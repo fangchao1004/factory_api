@@ -21,7 +21,6 @@ module.exports = function (router, sequelize, logger) {
             password: Sequelize.STRING(100),
             name: Sequelize.STRING(100),
             permission: Sequelize.STRING(100),
-            major_id: Sequelize.STRING(100),
             phonenumber: Sequelize.STRING(11),
             remark: Sequelize.STRING(100),
             isGroupLeader: Sequelize.INTEGER(1),
@@ -75,9 +74,9 @@ module.exports = function (router, sequelize, logger) {
                 ctx.response.type = 'json'
                 ctx.response.body = { code: -2, data: '注册失败 该玩家已经存在' }
             } else {
-                await Users.create(ctx.request.body)
+                let result = await Users.create(ctx.request.body)
                 ctx.response.type = 'json'
-                ctx.response.body = { code: 0, data: 'success' }
+                ctx.response.body = { code: 0, data: result }
             }
         } catch (error) {
             logger.debug(error)
