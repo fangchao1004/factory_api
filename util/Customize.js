@@ -103,6 +103,7 @@ module.exports = function (router, sequelize, logger) {
   router.post('/getSampleWithSchemeInfo', async (ctx, next) => {
     try {
       let sampleIdList = ctx.request.body.id;
+      let area0_id = ctx.request.body.area0_id;
       /// 第一步先获取所有的项目和方案的映射关系表
       let sql1 = `select sche_cyc_atm_map_sample.*, scheme_of_cycleDate.title as date_title,  scheme_of_cycleDate.cycleDate_id,sche_cyc_map_date.date_value,scheme_of_allowTime.title as allowTime_title,allow_time.begin,
       allow_time.end,allow_time.isCross,allow_time.name as atm_type_name   from sche_cyc_atm_map_sample
@@ -117,7 +118,7 @@ module.exports = function (router, sequelize, logger) {
       if (sampleIdList && sampleIdList.length > 0) { addSql = `and id in (${sampleIdList.join(',')})` }
       let sql2 = `select samples.*,device_types.name as device_type_name from samples
       left join (select * from device_types where effective = 1) device_types on device_types.id = samples.device_type_id
-      where samples.effective = 1 ${addSql}
+      where samples.effective = 1 ${addSql} and samples.area0_id = ${area0_id}
       order by samples.id`
       let resultOfScheme = await sequelize.query(sql1);
       let resultOfSample = await sequelize.query(sql2);

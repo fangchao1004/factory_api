@@ -16,6 +16,7 @@ module.exports = function (router, sequelize, logger) {
       device_type_id: Sequelize.INTEGER(11),
       table_name: Sequelize.STRING(100),
       content: Sequelize.STRING(100),
+      area0_id: Sequelize.INTEGER(11),///厂区id
     },
     {
       timestamps: true
