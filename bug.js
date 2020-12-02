@@ -28,12 +28,10 @@ module.exports = function (router, sequelize, logger) {
             area_remark: Sequelize.STRING(100),
             title_name: Sequelize.STRING(100),
             title_remark: Sequelize.STRING(100),
-            bug_type_id: Sequelize.INTEGER(11),
-            last_remark: Sequelize.STRING(100),
-            remark: Sequelize.STRING(100),
-            other_remark: Sequelize.STRING(100),
             closedAt: Sequelize.STRING(100),
             checkedAt: Sequelize.STRING(100),
+            last_status_time: Sequelize.STRING(100),
+            isread: Sequelize.INTEGER(1),
         }, {
             timestamps: true
         }

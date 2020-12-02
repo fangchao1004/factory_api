@@ -57,13 +57,14 @@ var sequelize = new Sequelize(
       min: 0,
       idle: 30000
     },
-    timezone: '+08:00'
+    timezone: '+08:00',
+    logging: false
   }
 )
 
 router.get('/version_update', async (ctx, next) => {
   ctx.response.type = 'json'
-  ctx.response.body = { code: 0, vn: '0.1.6' }
+  ctx.response.body = { code: 0, vn: '0.2.3.4' }
 })
 
 customizeInt(router, sequelize, logger)

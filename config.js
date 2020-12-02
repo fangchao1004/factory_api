@@ -1,5 +1,5 @@
 var config = {
-  database: 'factory', // 使用哪个数据库
+  database: 'factory', // 使用正式数据库
   username: 'root', // 用户名
   password: 'Xiebao0301@', // 口令
   host: 'ixiaomu.cn', // 主机名

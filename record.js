@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const moment = require('moment');
 
 module.exports = function (router, sequelize, logger) {
 
@@ -21,6 +22,7 @@ module.exports = function (router, sequelize, logger) {
       user_id: Sequelize.INTEGER(11),
       checkedAt: Sequelize.STRING(100),
       switch: Sequelize.INTEGER(1),
+      is_clean: Sequelize.INTEGER(1),
     },
     {
       timestamps: true
@@ -53,11 +55,12 @@ module.exports = function (router, sequelize, logger) {
 
   router.post('/insert_record', async (ctx, next) => {
     try {
+      console.log('插入一条记录:', moment().format("YYYY-MM-DD HH:mm:ss"), '--', JSON.stringify(ctx.request.body))
       await Records.create(ctx.request.body)
       ctx.response.type = 'json'
       ctx.response.body = { code: 0, data: 'success' }
     } catch (error) {
-      logger.debug(error)
+      console.log('插入记录失败:', moment().format("YYYY-MM-DD HH:mm:ss"), '--', JSON.stringify(ctx.request.body))
       ctx.response.type = 'json'
       ctx.response.body = { code: -1, data: 'fault' }
     }

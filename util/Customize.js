@@ -5,12 +5,13 @@ module.exports = function (router, sequelize, logger) {
   logger.debug('Customize API Init...')
   router.post('/obs', async (ctx, next) => {
     try {
-      // console.log("sql语句：",ctx.request.body.sql);
+      // console.log("sql语句：", ctx.request.body.sql);
       let result = await sequelize.query(ctx.request.body.sql);
       ctx.response.type = 'json'
       ctx.response.body = { code: 0, data: result[0] }
     } catch (error) {
       logger.debug(error)
+      console.log('error:', error)
       ctx.response.type = 'json'
       ctx.response.body = { code: -1, data: 'operate fault' }
     }
@@ -103,7 +104,7 @@ module.exports = function (router, sequelize, logger) {
   router.post('/getSampleWithSchemeInfo', async (ctx, next) => {
     try {
       let sampleIdList = ctx.request.body.id;
-      let area0_id = ctx.request.body.area0_id;
+      let area0_id = ctx.request.body.area0_id || 1;
       /// 第一步先获取所有的项目和方案的映射关系表
       let sql1 = `select sche_cyc_atm_map_sample.*, scheme_of_cycleDate.title as date_title,  scheme_of_cycleDate.cycleDate_id,sche_cyc_map_date.date_value,scheme_of_allowTime.title as allowTime_title,allow_time.begin,
       allow_time.end,allow_time.isCross,allow_time.name as atm_type_name   from sche_cyc_atm_map_sample

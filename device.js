@@ -41,22 +41,22 @@ module.exports = function (router, sequelize, logger) {
       timestamps: true
     }
   )
-  var Areas = sequelize.define(
-    'areas',
-    {
-      id: {
-        type: Sequelize.STRING(100),
-        primaryKey: true,
-        autoIncrement: true
-      },
-      name: Sequelize.STRING(100),
-    },
-    {
-      timestamps: true
-    }
-  )
-  Devices.belongsTo(Device_Types, { foreignKey: 'type_id', targetKey: 'id' })
-  Devices.belongsTo(Areas, { foreignKey: 'area_id', targetKey: 'id' })
+  // var Areas = sequelize.define(
+  //   'areas',
+  //   {
+  //     id: {
+  //       type: Sequelize.STRING(100),
+  //       primaryKey: true,
+  //       autoIncrement: true
+  //     },
+  //     name: Sequelize.STRING(100),
+  //   },
+  //   {
+  //     timestamps: true
+  //   }
+  // )
+  // Devices.belongsTo(Device_Types, { foreignKey: 'type_id', targetKey: 'id' })
+  // Devices.belongsTo(Areas, { foreignKey: 'area_id', targetKey: 'id' })
 
   ///////////////////
   router.post('/insert_device', async (ctx, next) => {
@@ -73,12 +73,14 @@ module.exports = function (router, sequelize, logger) {
   router.post('/find_device', async (ctx, next) => {
     try {
       let all = await Devices.findAll({
-        where: ctx.request.body,
-        include: [{ model: Device_Types }, { model: Areas }]
+        where: ctx.request.body
+        // include: [{ model: Device_Types }, { model: Areas }]
+        // include: [{ model: Device_Types }]
       })
       ctx.response.type = 'json'
       ctx.response.body = { code: 0, data: all }
     } catch (error) {
+      console.log('error:', error)
       logger.debug(error)
       ctx.response.type = 'json'
       ctx.response.body = { code: -1, data: 'find fault' }
