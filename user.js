@@ -64,6 +64,33 @@ module.exports = function (router, sequelize, logger) {
     }
   )
 
+  //------------------------------------------------------------------------------------
+  // 列出会员
+  //------------------------------------------------------------------------------------
+  router.post('/listPCLoginLog', async (ctx, next) => {
+    try {
+      if (!ctx.request.body.hasOwnProperty('page')) throw new Error('参数错误')
+      let page = parseInt(ctx.request.body.page) || 0
+      page = Math.max(page, 1)
+      delete ctx.request.body.page
+
+      const data = await PCLoginLogs.findAndCountAll({
+        where: ctx.request.body,
+        offset: (page - 1) * 10,
+        limit: 10
+      })
+
+      ctx.response.type = 'json'
+      ctx.response.body = {
+        code: 0,
+        data: { count: data.count, logs: data.rows }
+      }
+    } catch (error) {
+      ctx.response.type = 'json'
+      ctx.response.body = { code: -1, data: error.message }
+    }
+  })
+
   router.post('/verify', async (ctx, next) => {
     try {
       console.log(ctx.request.body, ctx.request.ip)
@@ -86,23 +113,47 @@ module.exports = function (router, sequelize, logger) {
           })
 
           if (isWhiteList) {
-            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 0, remark: '用户厂内登录,允许登录' })
+            await PCLoginLogs.create({
+              name: user.name,
+              username,
+              ip: ctx.request.ip,
+              status: 0,
+              remark: '用户厂内登录,允许登录'
+            })
 
             ctx.response.type = 'json'
             ctx.response.body = { code: 0, data: 'user in whitelist' }
           } else {
-            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 1, remark: '用户非厂内登录,拒绝登录' })
+            await PCLoginLogs.create({
+              name: user.name,
+              username,
+              ip: ctx.request.ip,
+              status: 1,
+              remark: '用户非厂内登录,拒绝登录'
+            })
 
             throw new Error('user not in whitelist')
           }
         } else {
-          await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 0, remark: '用户厂内登录,允许登录' })
+          await PCLoginLogs.create({
+            name: user.name,
+            username,
+            ip: ctx.request.ip,
+            status: 0,
+            remark: '用户厂内登录,允许登录'
+          })
 
           ctx.response.type = 'json'
           ctx.response.body = { code: 0, data: 'no whitelist existed' }
         }
       } else {
-        await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 0, remark: '用户有厂外登录权限,允许登录' })
+        await PCLoginLogs.create({
+          name: user.name,
+          username,
+          ip: ctx.request.ip,
+          status: 0,
+          remark: '用户有厂外登录权限,允许登录'
+        })
 
         ctx.response.type = 'json'
         ctx.response.body = { code: 0, data: 'user not use whitelist' }
