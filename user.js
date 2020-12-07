@@ -77,6 +77,7 @@ module.exports = function (router, sequelize, logger) {
       const data = await PCLoginLogs.findAndCountAll({
         where: ctx.request.body,
         offset: (page - 1) * 10,
+        order: [['createdAt', 'DESC']],
         limit: 10
       })
 
