@@ -96,7 +96,7 @@ module.exports = function (router, sequelize, logger) {
   router.post('/verify', async (ctx, next) => {
     try {
       console.log(ctx.request.body, ctx.request.ip)
-      const { username, uuid } = ctx.request.body
+      let { username, uuid } = ctx.request.body
       const user = await Users.findOne({ where: { username, effective: 1 } })
       const whiteLists = await WhiteLists.findAll()
       ///查找当前用户的最近一条，登录记录。
@@ -169,6 +169,7 @@ module.exports = function (router, sequelize, logger) {
         ctx.response.body = { code: 0, data: 'user not use whitelist' }
       }
     } catch (error) {
+      console.log('error:', error)
       ctx.response.type = 'json'
       ctx.response.body = { code: -1, data: error.message }
     }
