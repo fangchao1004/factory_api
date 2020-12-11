@@ -103,7 +103,9 @@ module.exports = function (router, sequelize, logger) {
       let uuid_is_different = false;///uuid与前一次不同
       if (uuid) {
         let res_last_log = await PCLoginLogs.findOne({ where: { username, $not: [{ uuid: null }] }, order: "id DESC" })///最近一次uuid不为null的登录。视为app登录
-        uuid_is_different = res_last_log.dataValues.uuid !== uuid///uuid与前一次不同
+        if (res_last_log) {
+          uuid_is_different = res_last_log.dataValues.uuid !== uuid///uuid与前一次不同
+        }
       } else { uuid = null }
       ///uuid = null 视为pc登录。uuid 存在视为app登录
       let extra_remark = uuid_is_different ? '。注意！移动端登录设备发生变更' : ''///app登录，设备变更时的补充备注
