@@ -57,7 +57,8 @@ module.exports = function (router, sequelize, logger) {
       username: Sequelize.CHAR(50),
       ip: Sequelize.CHAR(50),
       status: Sequelize.INTEGER(1),
-      remark: Sequelize.CHAR(50)
+      remark: Sequelize.CHAR(50),
+      uuid: Sequelize.CHAR(50),
     },
     {
       timestamps: true
@@ -95,13 +96,19 @@ module.exports = function (router, sequelize, logger) {
   router.post('/verify', async (ctx, next) => {
     try {
       console.log(ctx.request.body, ctx.request.ip)
-
-      const { username } = ctx.request.body
+      const { username, uuid } = ctx.request.body
       const user = await Users.findOne({ where: { username, effective: 1 } })
       const whiteLists = await WhiteLists.findAll()
-
+      ///查找当前用户的最近一条，登录记录。
+      let uuid_is_different = false;///uuid与前一次不同
+      if (uuid) {
+        let res_last_log = await PCLoginLogs.findOne({ where: { username, $not: [{ uuid: null }] }, order: "id DESC" })///最近一次uuid不为null的登录。视为app登录
+        uuid_is_different = res_last_log.dataValues.uuid !== uuid///uuid与前一次不同
+      } else { uuid = null }
+      ///uuid = null 视为pc登录。uuid 存在视为app登录
+      let extra_remark = uuid_is_different ? '。注意！移动端登录设备发生变更' : ''///app登录，设备变更时的补充备注
       if (!user) {
-        await PCLoginLogs.create({ name: '未知', username, ip: ctx.request.ip, status: 1, remark: '未知用户,拒绝登录' })
+        await PCLoginLogs.create({ name: '未知', username, ip: ctx.request.ip, status: 1, remark: '未知用户,拒绝登录' + extra_remark, uuid })
         throw new Error('no user existed')
       }
 
@@ -119,7 +126,7 @@ module.exports = function (router, sequelize, logger) {
               username,
               ip: ctx.request.ip,
               status: 0,
-              remark: '用户厂内登录,允许登录'
+              remark: '用户厂内登录,允许登录' + extra_remark, uuid
             })
 
             ctx.response.type = 'json'
@@ -130,7 +137,7 @@ module.exports = function (router, sequelize, logger) {
               username,
               ip: ctx.request.ip,
               status: 1,
-              remark: '用户非厂内登录,拒绝登录'
+              remark: '用户非厂内登录,拒绝登录' + extra_remark, uuid
             })
 
             throw new Error('user not in whitelist')
@@ -141,7 +148,7 @@ module.exports = function (router, sequelize, logger) {
             username,
             ip: ctx.request.ip,
             status: 0,
-            remark: '用户厂内登录,允许登录'
+            remark: '用户厂内登录,允许登录' + extra_remark, uuid
           })
 
           ctx.response.type = 'json'
@@ -153,7 +160,7 @@ module.exports = function (router, sequelize, logger) {
           username,
           ip: ctx.request.ip,
           status: 0,
-          remark: '用户有厂外登录权限,允许登录'
+          remark: '用户有厂外登录权限,允许登录' + extra_remark, uuid
         })
 
         ctx.response.type = 'json'
