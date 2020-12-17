@@ -106,13 +106,13 @@ module.exports = function (router, sequelize, logger) {
         if (res_first_log) {///之前有uuid记录
           uuid_is_different = res_first_log.dataValues.uuid !== uuid///uuid与前一次不同。不允许登录
           if (uuid_is_different) {
-            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 1, remark: '设备号不一致,拒绝登录', uuid })
+            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 1, remark: '设备发生变更,拒绝登录', uuid })
             ctx.response.type = 'json'
-            ctx.response.body = { code: -1, data: '设备号不一致,拒绝登录' }
+            ctx.response.body = { code: -1, data: '设备发生变更,拒绝登录' }
           } else {
-            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 0, remark: '设备号一致,允许登录', uuid })
+            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 0, remark: '允许登录', uuid })
             ctx.response.type = 'json'
-            ctx.response.body = { code: 0, data: '设备号一致,允许登录' }
+            ctx.response.body = { code: 0, data: '允许登录' }
           }
         } else {///之前没有uuid记录。就把此次的uuid,一起存入库
           if (!user) {
@@ -125,10 +125,10 @@ module.exports = function (router, sequelize, logger) {
               username,
               ip: ctx.request.ip,
               status: 0,
-              remark: '首次使用app允许登录', uuid
+              remark: '允许登录', uuid
             })
             ctx.response.type = 'json'
-            ctx.response.body = { code: 0, data: '首次使用app允许登录' }
+            ctx.response.body = { code: 0, data: '允许登录' }
           }
         }
         return ///截止
