@@ -99,18 +99,45 @@ module.exports = function (router, sequelize, logger) {
       let { username, uuid } = ctx.request.body
       const user = await Users.findOne({ where: { username, effective: 1 } })
       const whiteLists = await WhiteLists.findAll()
-      ///查找当前用户的最近一条，登录记录。
+      ///uuid app登录 【以下代码】
       let uuid_is_different = false;///uuid与前一次不同
-      if (uuid) {
-        let res_last_log = await PCLoginLogs.findOne({ where: { username, $not: [{ uuid: null }] }, order: "id DESC" })///最近一次uuid不为null的登录。视为app登录
-        if (res_last_log) {
-          uuid_is_different = res_last_log.dataValues.uuid !== uuid///uuid与前一次不同
+      if (uuid) {///app登录
+        let res_first_log = await PCLoginLogs.findOne({ where: { username, $not: [{ uuid: null }] } })///第一次uuid不为null的登录。视为app登录
+        if (res_first_log) {///之前有uuid记录
+          uuid_is_different = res_first_log.dataValues.uuid !== uuid///uuid与前一次不同。不允许登录
+          if (uuid_is_different) {
+            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 1, remark: '设备号不一致,拒绝登录', uuid })
+            ctx.response.type = 'json'
+            ctx.response.body = { code: -1, data: '设备号不一致,拒绝登录' }
+          } else {
+            await PCLoginLogs.create({ name: user.name, username, ip: ctx.request.ip, status: 0, remark: '设备号一致,允许登录', uuid })
+            ctx.response.type = 'json'
+            ctx.response.body = { code: 0, data: '设备号一致,允许登录' }
+          }
+        } else {///之前没有uuid记录。就把此次的uuid,一起存入库
+          if (!user) {
+            await PCLoginLogs.create({ name: '未知', username, ip: ctx.request.ip, status: 1, remark: '未知用户,拒绝登录', uuid })
+            ctx.response.type = 'json'
+            ctx.response.body = { code: -1, data: '未知用户,拒绝登录' }
+          } else {
+            await PCLoginLogs.create({
+              name: user.name,
+              username,
+              ip: ctx.request.ip,
+              status: 0,
+              remark: '首次使用app允许登录', uuid
+            })
+            ctx.response.type = 'json'
+            ctx.response.body = { code: 0, data: '首次使用app允许登录' }
+          }
         }
-      } else { uuid = null }
-      ///uuid = null 视为pc登录。uuid 存在视为app登录
-      let extra_remark = uuid_is_different ? '。注意！移动端登录设备发生变更' : ''///app登录，设备变更时的补充备注
+        return ///截止
+      }
+      ///uuid app登录【以上代码】
+
+      ///uuid不存在视为pc登录。uuid 存在视为app登录【以上代码】
       if (!user) {
-        await PCLoginLogs.create({ name: '未知', username, ip: ctx.request.ip, status: 1, remark: '未知用户,拒绝登录' + extra_remark, uuid })
+        await PCLoginLogs.create({ name: '未知', username, ip: ctx.request.ip, status: 1, remark: '未知用户,拒绝登录' })
         throw new Error('no user existed')
       }
 
@@ -128,7 +155,7 @@ module.exports = function (router, sequelize, logger) {
               username,
               ip: ctx.request.ip,
               status: 0,
-              remark: '用户厂内登录,允许登录' + extra_remark, uuid
+              remark: '用户厂内登录,允许登录'
             })
 
             ctx.response.type = 'json'
@@ -139,7 +166,7 @@ module.exports = function (router, sequelize, logger) {
               username,
               ip: ctx.request.ip,
               status: 1,
-              remark: '用户非厂内登录,拒绝登录' + extra_remark, uuid
+              remark: '用户非厂内登录,拒绝登录'
             })
 
             throw new Error('user not in whitelist')
@@ -150,7 +177,7 @@ module.exports = function (router, sequelize, logger) {
             username,
             ip: ctx.request.ip,
             status: 0,
-            remark: '用户厂内登录,允许登录' + extra_remark, uuid
+            remark: '用户厂内登录,允许登录'
           })
 
           ctx.response.type = 'json'
@@ -162,7 +189,7 @@ module.exports = function (router, sequelize, logger) {
           username,
           ip: ctx.request.ip,
           status: 0,
-          remark: '用户有厂外登录权限,允许登录' + extra_remark, uuid
+          remark: '用户有厂外登录权限,允许登录'
         })
 
         ctx.response.type = 'json'
