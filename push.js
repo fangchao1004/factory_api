@@ -67,7 +67,7 @@ module.exports = function (router, sequelize, logger) {
             let all = await Pushs.findAll({
                 where: { user_id: ctx.request.body.user_id }
             }) /// 获取相关人员的pushid
-            // console.log('user_id:', ctx.request.body.user_id)
+            console.log('user_id:', ctx.request.body.user_id)
             let temp = all.map((item) => {
                 let obj = {};
                 obj.user_id = item.user_id
@@ -75,13 +75,20 @@ module.exports = function (router, sequelize, logger) {
                 obj.pushid = item.pushid
                 return obj
             })
-            // console.log('查询到这几个:', temp)
+            console.log('push表中查询到这几个:', temp)
             if (all) {
                 for (let i = 0; i < all.length; i++) {
                     const oneUserInfo = all[i];
-                    console.log('开始推送', new Date().getTime())
-                    await PushApi.pushMessageToSingle(oneUserInfo.pushid, ctx.request.body.title, ctx.request.body.text)
-                    console.log('推送完毕', new Date().getTime())
+                    let startTime = new Date().getTime();
+                    console.log('开始推送', startTime, "pushid:" + oneUserInfo.pushid, "user_name:", oneUserInfo.user_name, "user_id:", oneUserInfo.user_id)
+                    try {
+                        let push_result = await PushApi.pushMessageToSingle(oneUserInfo.pushid, ctx.request.body.title, ctx.request.body.text)
+                        if (push_result) {
+                            console.log('推送成功: 耗时', (new Date().getTime() - startTime))
+                        }
+                    } catch (error) {
+                        console.log('推送失败:', error)
+                    }
                     console.log('===============================')
                 }
             }

@@ -61,6 +61,8 @@ PushApi.pushMessageToSingle = function (cid, title, text) {
         gt.pushMessageToSingle(message, target, function (err, res) {
             if (res.result === 'ok') {
                 resolve(true);
+            }else{
+                reject(res.result)
             }
             if (err != null && err.exception != null && err.exception instanceof RequestError) {
                 reject(err);
