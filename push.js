@@ -67,8 +67,15 @@ module.exports = function (router, sequelize, logger) {
             let all = await Pushs.findAll({
                 where: { user_id: ctx.request.body.user_id }
             }) /// 获取相关人员的pushid
-            console.log('user_id:', ctx.request.body.user_id)
-            console.log('查询到这几个', all.length)
+            // console.log('user_id:', ctx.request.body.user_id)
+            let temp = all.map((item) => {
+                let obj = {};
+                obj.user_id = item.user_id
+                obj.user_name = item.user_name
+                obj.pushid = item.pushid
+                return obj
+            })
+            // console.log('查询到这几个:', temp)
             if (all) {
                 for (let i = 0; i < all.length; i++) {
                     const oneUserInfo = all[i];
