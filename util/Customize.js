@@ -5,7 +5,7 @@ module.exports = function (router, sequelize, logger) {
   logger.debug('Customize API Init...')
   router.post('/obs', async (ctx, next) => {
     try {
-      // console.log("sql语句：", ctx.request.body.sql);
+      console.log("sql语句：", ctx.request.body.sql);
       let result = await sequelize.query(ctx.request.body.sql);
       ctx.response.type = 'json'
       ctx.response.body = { code: 0, data: result[0] }
@@ -13,7 +13,7 @@ module.exports = function (router, sequelize, logger) {
       logger.debug(error)
       console.log('error:', error)
       ctx.response.type = 'json'
-      ctx.response.body = { code: -1, data: 'operate fault' }
+      ctx.response.body = { code: -1, data: 'operate fault', des: error }
     }
   })
   /**

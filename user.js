@@ -239,12 +239,13 @@ module.exports = function (router, sequelize, logger) {
       }
       var all = await Users.findAll({
         where: {
-          username: ctx.request.body.username
+          username: ctx.request.body.username,
+          effective: 1
         }
       })
       if (all && all.length > 0) {
         ctx.response.type = 'json'
-        ctx.response.body = { code: -2, data: '注册失败 该玩家已经存在' }
+        ctx.response.body = { code: -2, data: '注册失败 该用户已经存在' }
       } else {
         let result = await Users.create(ctx.request.body)
         ctx.response.type = 'json'
